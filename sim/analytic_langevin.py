@@ -61,7 +61,7 @@ class CFG:
     SEED       = 42
 
     # I/O
-    OUT_DIR  = "sim/out_langevin_3"
+    OUT_DIR  = "sim/out_langevin_8"
     GSD_NAME = "run.gsd"
     XYZ_NAME = "run.xyz"
 
