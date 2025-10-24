@@ -44,6 +44,7 @@ class CFG:
     RET_EXTRA= 10.0
 
     # Materiale pe piesă
+    BASE_1_BALISTIC = dict(e_n=1, beta_t=1)
     MAT_CUBE_L = dict(e_n=0.9, beta_t=0.7)
     MAT_CUBE_R = dict(e_n=0.3, beta_t=0.55)
     MAT_FUN  = [dict(e_n=0.85, beta_t=0.85),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3)]
@@ -61,7 +62,7 @@ class CFG:
     SEED       = 42
 
     # I/O
-    OUT_DIR  = "sim/out_langevin_stab_gpu_fast_15"
+    OUT_DIR  = "sim/out_langevin_stab_gpu_fast_25"
     GSD_NAME = "run.gsd"
     XYZ_NAME = "run.xyz"
 
@@ -76,7 +77,7 @@ class CFG:
 
     # Reflexii: sub-stepping adaptiv
     COLLISION_CFL = 0.5
-    MAX_SUBSTEPS  = 8
+    MAX_SUBSTEPS  = 32
 
 # map tipuri piese
 PIECE_TYPES = {"box":0, "cylx":1, "cyly":2}
@@ -226,7 +227,7 @@ def locate_points_in_pieces(P, pieces):
 
 # ---------- GPU vectorizat: pack geometrie + inside/locate ----------
 
-def pack_geometry_xp(pieces, xp):
+def pack_geometry_xp(pieces, xp, kt_over_m):
     K = len(pieces)
     types = xp.asarray([PIECE_TYPES[p['type']] for p in pieces], dtype=xp.int32)
     e_n   = xp.asarray([p['e_n']   for p in pieces], dtype=xp.float32)
@@ -245,7 +246,7 @@ def pack_geometry_xp(pieces, xp):
         else:
             cyl_c[i] = xp.asarray([S['cx'],S['cy'],S['cz']], dtype=xp.float32)
             cyl_R[i] = float(S['R']); cyl_L[i] = float(S['L'])
-    return dict(types=types, e_n=e_n, bt=bt, box_c=box_c, box_s=box_s, cyl_c=cyl_c, cyl_R=cyl_R, cyl_L=cyl_L)
+    return dict(types=types, e_n=e_n, bt=bt, box_c=box_c, box_s=box_s, cyl_c=cyl_c, cyl_R=cyl_R, cyl_L=cyl_L, kT_over_m=kt_over_m)
 
 
 def inside_masks_xp(P, G, xp):
@@ -388,6 +389,42 @@ def collide_one_piece(p_old, p_new, v, S):
     return p_new, v, False
 
 # ---------- GPU: coliziuni vectorizate ----------
+def ou_bounce_vectorized(vJ, nJ, en_J, bt_J, s, xp):
+    """
+    OU bounce: pastreaza materialul (e_n, beta_t) dar pune kick termic astfel incat
+    post-coliziune sa fie Maxwell–Boltzmann la T (FDT local).
+
+    vJ   : (M,3) viteze incident
+    nJ   : (M,3) normale unitare (spre interiorul volumului)
+    en_J : (M,)  coef. restituție normal (0..1]
+    bt_J : (M,)  amortizare tangențială (0..1]
+    s    : sqrt(kT_over_m) (scalar)  # s = sqrt(k_B*T/m)
+    xp   : numpy sau cupy
+    """
+    # componente normal/tangential
+    vn = xp.sum(vJ * nJ, axis=1)                      # (M,)
+    vt = vJ - vn[:, None] * nJ                        # (M,3)
+
+    # gaussian 3D -> proiectie pe planul tangent (2D): cov = I - n n^T
+    xi3 = xp.random.standard_normal(size=vJ.shape, dtype=vJ.dtype)  # (M,3)
+    xi_t = xi3 - xp.sum(xi3 * nJ, axis=1, keepdims=True) * nJ       # (M,3) tangent
+
+    # factori
+    st = xp.sqrt(xp.maximum(0.0, 1.0 - bt_J**2)) * s  # (M,)
+    sn = xp.sqrt(xp.maximum(0.0, 1.0 - en_J**2)) * s  # (M,)
+
+    # update tangențial (OU pe 2D): vt' = beta_t * vt + st * xi_t
+    vt_p = bt_J[:, None] * vt + st[:, None] * xi_t
+
+    # update normal (OU pe 1D) + iesire din perete (semn +)
+    xi_n = xp.random.standard_normal(size=vn.shape, dtype=vJ.dtype) # (M,)
+    vn_in = xp.abs(vn)                                              # viteza de intrare (>0)
+    vn_p  = xp.abs(en_J * vn_in + sn * xi_n)                        # iesire (>0)
+
+    # recombinare
+    v_out = vt_p + vn_p[:, None] * nJ
+    return v_out
+
 
 def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
     N = p_new.shape[0]
@@ -438,10 +475,13 @@ def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
                 XJ[jz,2] = G['box_c'][idx[jz],2] + sign*SJ[jz,2]*0.5
                 n[jz,2] = sign
             p_corr[J] = XJ
-            vn = (v[J]*n).sum(axis=1, keepdims=True)*n
-            vt = v[J]-vn
-            en = e[J][:,None]; btJ = bt[J][:,None]
-            v_corr[J] = -en*vn + btJ*vt
+            # OU bounce
+            enJ  = e[J].astype(xp.float32)          # (M,)
+            btJ  = bt[J].astype(xp.float32)         # (M,)
+            s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))  # sqrt(kT/m) (scalar)
+            v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
+                                            n.astype(xp.float32),
+                                            enJ, btJ, s, xp)
             hit[J] = True
 
     # CYLX
@@ -457,10 +497,13 @@ def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
             sign = xp.sign(XJ[:,0]-G['cyl_c'][idx[J],0])
             XJ[:,0] = G['cyl_c'][idx[J],0] + sign*(G['cyl_L'][idx[J]]*0.5)
             n = xp.zeros_like(XJ); n[:,0] = sign
-            vn = (v[J]*n).sum(axis=1, keepdims=True)*n
-            vt = v[J]-vn
-            en = e[J][:,None]; btJ = bt[J][:,None]
-            v_corr[J] = -en*vn + btJ*vt
+          # ... ai n shape (M,3) cu n[:,0]=±1, restul 0 ...
+            enJ  = e[J].astype(xp.float32)
+            btJ  = bt[J].astype(xp.float32)
+            s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
+            v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
+                                            n.astype(xp.float32),
+                                            enJ, btJ, s, xp)
             p_corr[J] = XJ
             hit[J] = True
         I2 = xp.where(mx & (~hit))[0]
@@ -479,10 +522,13 @@ def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
                 n = xp.stack([xp.zeros(J.size,dtype=xp.float32), ry/r, rz/r], axis=1)
                 XJ[:,1] = C3[:,1] + R3*(ry/r)
                 XJ[:,2] = C3[:,2] + R3*(rz/r)
-                vn = (v[J]*n).sum(axis=1, keepdims=True)*n
-                vt = v[J]-vn
-                en = e[J][:,None]; btJ = bt[J][:,None]
-                v_corr[J] = -en*vn + btJ*vt
+                # n = [0, ry/r, rz/r], shape (M,3) deja construit
+                enJ  = e[J].astype(xp.float32)
+                btJ  = bt[J].astype(xp.float32)
+                s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
+                v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
+                                                n.astype(xp.float32),
+                                                enJ, btJ, s, xp)
                 p_corr[J] = XJ
                 hit[J] = True
 
@@ -499,10 +545,13 @@ def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
             sign = xp.sign(XJ[:,1]-G['cyl_c'][idx[J],1])
             XJ[:,1] = G['cyl_c'][idx[J],1] + sign*(G['cyl_L'][idx[J]]*0.5)
             n = xp.zeros_like(XJ); n[:,1] = sign
-            vn = (v[J]*n).sum(axis=1, keepdims=True)*n
-            vt = v[J]-vn
-            en = e[J][:,None]; btJ = bt[J][:,None]
-            v_corr[J] = -en*vn + btJ*vt
+            enJ  = e[J].astype(xp.float32)
+            btJ  = bt[J].astype(xp.float32)
+            s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
+            v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
+                                            n.astype(xp.float32),
+                                            enJ, btJ, s, xp)
+
             p_corr[J] = XJ
             hit[J] = True
         I2 = xp.where(my & (~hit))[0]
@@ -521,10 +570,12 @@ def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
                 n = xp.stack([rx/r, xp.zeros(J.size,dtype=xp.float32), rz/r], axis=1)
                 XJ[:,0] = C3[:,0] + R3*(rx/r)
                 XJ[:,2] = C3[:,2] + R3*(rz/r)
-                vn = (v[J]*n).sum(axis=1, keepdims=True)*n
-                vt = v[J]-vn
-                en = e[J][:,None]; btJ = bt[J][:,None]
-                v_corr[J] = -en*vn + btJ*vt
+                enJ  = e[J].astype(xp.float32)
+                btJ  = bt[J].astype(xp.float32)
+                s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
+                v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
+                                                n.astype(xp.float32),
+                                                enJ, btJ, s, xp)
                 p_corr[J] = XJ
                 hit[J] = True
     return p_corr, v_corr, hit
@@ -547,7 +598,7 @@ def reflect_gpu(p_old, p_new, v, prev_idx, G, xp):
         sel2 = I[~hit]
         if sel2.size>0:
             p_new[sel2] = p_old[sel2]
-            v[sel2] *= -0.5
+            v[sel2] *= 1
             new_idx[sel2] = prev_idx[sel2]
             crossed[sel2] = False
     return p_new, v, new_idx, crossed
@@ -660,10 +711,15 @@ def main():
         except Exception:
             gpu_rng = None
 
+    m  = float(CFG.MASS)
+    dt = float(args.dt)
+    gamma = float(args.gamma)
+    kt = float(args.kt)
+
     # piece index (CPU/GPU)
     Gx = None
     if xp is cp:
-        Gx = pack_geometry_xp(pieces, cp)
+        Gx = pack_geometry_xp(pieces, cp, kt/m)
         piece_idx = locate_points_in_pieces_xp(cp.asarray(pos0), Gx, cp).get()
     else:
         piece_idx = locate_points_in_pieces(pos0, pieces)
@@ -676,10 +732,6 @@ def main():
     pos = xp.asarray(pos0)
     vel = xp.asarray(vel0)
 
-    m  = float(CFG.MASS)
-    dt = float(args.dt)
-    gamma = float(args.gamma)
-    kt = float(args.kt)
 
     # Corecție zgomot: dv = -(γ/m)v dt + [sqrt(2γkT)/m] dW
     noise_sigma = math.sqrt(2.0*gamma*kt) * math.sqrt(dt) / m
@@ -810,7 +862,7 @@ def main():
             if k>=0:
                 d = wall_distance_one(pos_cpu[pid], pieces[k])
             dist_samp.append(d)
-        dmed = np.median(dist_samp) if len(dist_samp)>0 else 1.0
+        dmed = np.percentile(dist_samp, 20) if len(dist_samp)>0 else 1.0
         nsub = 1
         if dmed>1e-6:
             est = step_len / (CFG.COLLISION_CFL * dmed)
