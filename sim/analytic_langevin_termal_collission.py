@@ -23,6 +23,9 @@ except Exception:
 
 # ---------------- CONFIG ----------------
 class CFG:
+    WALL_MODEL = "ou"     # Variant 2 (keeps e_n, beta_t)
+    R_EPS = 1e-12         # radial epsilon for cylinders
+    AXIS_TIE_TOL = 1e-7   # tie tolerance on BOX penetration
     # Box vizual pentru sampling inițial
     Lx, Ly, Lz = 520.0, 320.0, 260.0
 
@@ -62,7 +65,7 @@ class CFG:
     SEED       = 42
 
     # I/O
-    OUT_DIR  = "sim/out_langevin_stab_gpu_fast_25"
+    OUT_DIR  = "sim/out_37"
     GSD_NAME = "run.gsd"
     XYZ_NAME = "run.xyz"
 
@@ -286,15 +289,39 @@ def inside_masks_xp(P, G, xp):
     return masks
 
 
+def _unit(v, xp, eps=1e-12):
+    nrm = xp.linalg.norm(v, axis=1, keepdims=True)
+    return v / xp.maximum(nrm, xp.asarray(eps, dtype=v.dtype))
+
 def locate_points_in_pieces_xp(P, G, xp):
-    m = inside_masks_xp(P, G, xp)  # (K,N)
-    K,N = m.shape
-    idxs = xp.arange(K, dtype=xp.int32)[:,None]
-    scores = xp.where(m, (K - idxs), 0)
-    arg = scores.argmax(axis=0)
-    any_ = m.any(axis=0)
-    out = xp.where(any_, arg, -1)
-    return out.astype(xp.int32)
+    """
+    Random tie-break among multiple 'inside' pieces.
+    Eliminates deterministic bias when pieces overlap (seals, caps touching walls, etc.).
+    """
+    m = inside_masks_xp(P, G, xp)  # (K,N) booleans
+    K, N = m.shape
+    out = xp.full((N,), -1, dtype=xp.int32)
+
+    hits = m.sum(axis=0)             # (N,)
+    none   = (hits == 0)
+    single = (hits == 1)
+    multi  = (hits >= 2)
+
+    # Single: index of the True piece
+    if bool(single.any()):
+        I = xp.where(single)[0]
+        out[I] = xp.argmax(m[:, I], axis=0).astype(xp.int32)
+
+    # Multi: random tie-break
+    if bool(multi.any()):
+        I = xp.where(multi)[0]
+        rndu = xp.random.random(size=I.size)
+        for k, j in enumerate(I.tolist()):
+            cand = xp.where(m[:, j])[0]
+            pick = int(xp.floor(rndu[k] * cand.size) % cand.size)
+            out[j] = cand[pick].astype(xp.int32)
+
+    return out
 
 # ---------- distanța la perete (CPU, pt. histograme) ----------
 
@@ -401,6 +428,9 @@ def ou_bounce_vectorized(vJ, nJ, en_J, bt_J, s, xp):
     s    : sqrt(kT_over_m) (scalar)  # s = sqrt(k_B*T/m)
     xp   : numpy sau cupy
     """
+    norm = xp.linalg.norm(nJ, axis=1, keepdims=True)
+    nJ   = nJ / xp.maximum(norm, xp.asarray(1e-12, dtype=norm.dtype))
+
     # componente normal/tangential
     vn = xp.sum(vJ * nJ, axis=1)                      # (M,)
     vt = vJ - vn[:, None] * nJ                        # (M,3)
@@ -425,182 +455,283 @@ def ou_bounce_vectorized(vJ, nJ, en_J, bt_J, s, xp):
     v_out = vt_p + vn_p[:, None] * nJ
     return v_out
 
+def wall_bounce_ou(vJ, nJ, en_J, bt_J, s, xp):
+    """
+    OU bounce without bias on normal:
+      vt' = beta_t * vt + sqrt(1-beta_t^2) * s * xi_t
+      vn' = e_n * |vn_in| + sqrt(1-e_n^2) * s * xi_n, with vn' > 0 (resample if needed)
+    Respects OU/FDT while enforcing outward normal without the 'abs() after update' bias.
+    """
+    # Normalize normal
+    nJ = _unit(nJ, xp)
+
+    # Decompose
+    vn = xp.sum(vJ * nJ, axis=1)                   # (M,)
+    vt = vJ - vn[:, None] * nJ                     # (M,3)
+
+    # Tangent stochastic kick: project 3D gaussian to tangent plane
+    xi3  = xp.random.standard_normal(size=vJ.shape, dtype=vJ.dtype)
+    xi_t = xi3 - xp.sum(xi3 * nJ, axis=1, keepdims=True) * nJ
+
+    st = xp.sqrt(xp.maximum(0.0, 1.0 - bt_J**2)) * s
+    sn = xp.sqrt(xp.maximum(0.0, 1.0 - en_J**2)) * s
+
+    vt_p = bt_J[:, None] * vt + st[:, None] * xi_t
+
+    # Normal component with rare re-draw to ensure outward motion without biasing stats
+    vn_in = xp.abs(vn)
+    # primul draw pe normal (aceeași formă ca vn)
+    xi_n = xp.random.standard_normal(vn.shape, dtype=vJ.dtype)
+    vn_p = en_J * vn_in + sn * xi_n
+
+    # 2-3 reîncercări rare DOAR pe cei care încă nu ies; generăm tot timpul cu forma completă
+    for _ in range(3):
+        bad = vn_p <= 0
+        if not bool(bad.any()):
+            break
+        xi_n = xp.random.standard_normal(vn.shape, dtype=vJ.dtype)
+        vn_prop = en_J * vn_in + sn * xi_n
+        vn_p = xp.where(bad, vn_prop, vn_p)
+
+    vn_p = xp.maximum(vn_p, xp.asarray(1e-12, dtype=vJ.dtype))
+
+    return vt_p + vn_p[:, None] * nJ
 
 def collide_one_piece_gpu(p_old, p_new, v, idx, G, xp):
+    """
+    Replaces your collide_one_piece_gpu with:
+      - cylinder normals recomputed AFTER snapping + epsilon,
+      - normals normalized before bounce,
+      - OU wall bounce without bias (using e_n, beta_t),
+      - supports BOX, CYLX, CYLY (types: 0,1,2),
+      - returns (p_corr, v_corr, hit_mask).
+    """
     N = p_new.shape[0]
-    if N==0:
+    if N == 0:
         return p_new, v, xp.zeros((0,), dtype=xp.bool_)
-    p_corr = p_new.copy(); v_corr = v.copy(); hit = xp.zeros((N,), dtype=xp.bool_)
-    t = G['types'][idx]
-    e = G['e_n'][idx]; bt = G['bt'][idx]
 
-    # BOX
-    mb = (t==0)
-    if mb.any():
+    p_corr = p_new.copy()
+    v_corr = v.copy()
+    hit = xp.zeros((N,), dtype=xp.bool_)
+
+    t  = G['types'][idx]
+    e  = G['e_n'][idx].astype(xp.float32)
+    bt = G['bt'][idx].astype(xp.float32)
+    s  = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))  # sqrt(kT/m)
+
+    # ========== BOX (t==0) ==========
+    mb = (t == 0)
+    if bool(mb.any()):
         I = xp.where(mb)[0]
-        C = G['box_c'][idx[I]]; S=G['box_s'][idx[I]]
+        C = G['box_c'][idx[I]]
+        S = G['box_s'][idx[I]]
         X = p_new[I]
         d = X - C
-        px = xp.abs(d[:,0]) - S[:,0]*0.5
-        py = xp.abs(d[:,1]) - S[:,1]*0.5
-        pz = xp.abs(d[:,2]) - S[:,2]*0.5
-        pen = xp.stack([xp.maximum(px,0), xp.maximum(py,0), xp.maximum(pz,0)],axis=1)
-        hitI = (pen.max(axis=1)>0)
-        if hitI.any():
-            J = I[hitI]
-            dJ = p_new[J]-G['box_c'][idx[J]]; SJ=G['box_s'][idx[J]]
-            pxJ = xp.abs(dJ[:,0]) - SJ[:,0]*0.5
-            pyJ = xp.abs(dJ[:,1]) - SJ[:,1]*0.5
-            pzJ = xp.abs(dJ[:,2]) - SJ[:,2]*0.5
-            penJ = xp.stack([xp.maximum(pxJ,0), xp.maximum(pyJ,0), xp.maximum(pzJ,0)],axis=1)
-            ax = penJ.argmax(axis=1)
-            n = xp.zeros((J.size,3), dtype=xp.float32)
+        px = xp.abs(d[:,0]) - S[:,0] * 0.5
+        py = xp.abs(d[:,1]) - S[:,1] * 0.5
+        pz = xp.abs(d[:,2]) - S[:,2] * 0.5
+        pen = xp.stack([xp.maximum(px,0), xp.maximum(py,0), xp.maximum(pz,0)], axis=1)
+        hitI = (pen.max(axis=1) > 0)
+        if bool(hitI.any()):
+            J  = I[hitI]
+            dJ = p_new[J] - G['box_c'][idx[J]]
+            SJ = G['box_s'][idx[J]]
+            pxJ = xp.abs(dJ[:,0]) - SJ[:,0] * 0.5
+            pyJ = xp.abs(dJ[:,1]) - SJ[:,1] * 0.5
+            pzJ = xp.abs(dJ[:,2]) - SJ[:,2] * 0.5
+            penJ = xp.stack([xp.maximum(pxJ,0), xp.maximum(pyJ,0), xp.maximum(pzJ,0)], axis=1)
+
+            # axis selection with tiny random tie-break when equal penetration
+            ax_raw = penJ.argmax(axis=1)
+            tol    = xp.asarray(1e-7, dtype=penJ.dtype)
+            pmax   = penJ.max(axis=1, keepdims=True)
+            ties   = xp.abs(penJ - pmax) < tol
+            multi  = ties.sum(axis=1) > 1
+            ax = ax_raw.copy()
+            if bool(multi.any()):
+                I_multi = xp.where(multi)[0]
+                rnd = xp.random.randint(0, 3, size=I_multi.size)
+                for k, ii in enumerate(I_multi.tolist()):
+                    cand = xp.where(ties[ii])[0]
+                    ax[ii] = cand[rnd[k] % cand.size]
+
+            # build normals & snap to face
+            n = xp.zeros((J.size, 3), dtype=xp.float32)
             XJ = p_corr[J]
-            jx = xp.where(ax==0)[0]
-            if jx.size>0:
+            jx = xp.where(ax == 0)[0]
+            if jx.size > 0:
                 jj = J[jx]
                 sign = xp.sign(dJ[jx,0])
-                XJ[jx,0] = G['box_c'][idx[jj],0] + sign*SJ[jx,0]*0.5
-                n[jx,0] = sign
-            jy = xp.where(ax==1)[0]
-            if jy.size>0:
+                sign = xp.where(sign == 0, xp.ones_like(sign), sign)
+                XJ[jx,0] = G['box_c'][idx[jj],0] + sign * SJ[jx,0] * 0.5
+                n[jx,0]  = sign
+            jy = xp.where(ax == 1)[0]
+            if jy.size > 0:
                 jj = J[jy]
                 sign = xp.sign(dJ[jy,1])
-                XJ[jy,1] = G['box_c'][idx[jj],1] + sign*SJ[jy,1]*0.5
-                n[jy,1] = sign
-            jz = xp.where(ax==2)[0]
-            if jz.size>0:
+                sign = xp.where(sign == 0, xp.ones_like(sign), sign)
+                XJ[jy,1] = G['box_c'][idx[jj],1] + sign * SJ[jy,1] * 0.5
+                n[jy,1]  = sign
+            jz = xp.where(ax == 2)[0]
+            if jz.size > 0:
                 jj = J[jz]
                 sign = xp.sign(dJ[jz,2])
-                XJ[jz,2] = G['box_c'][idx[jz],2] + sign*SJ[jz,2]*0.5
-                n[jz,2] = sign
+                sign = xp.where(sign == 0, xp.ones_like(sign), sign)
+                XJ[jz,2] = G['box_c'][idx[jj],2] + sign * SJ[jz,2] * 0.5
+                n[jz,2]  = sign
+
             p_corr[J] = XJ
-            # OU bounce
-            enJ  = e[J].astype(xp.float32)          # (M,)
-            btJ  = bt[J].astype(xp.float32)         # (M,)
-            s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))  # sqrt(kT/m) (scalar)
-            v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
-                                            n.astype(xp.float32),
-                                            enJ, btJ, s, xp)
+
+            # Normalize normal and do OU bounce
+            n = _unit(n, xp)
+            v_corr[J] = wall_bounce_ou(v[J].astype(xp.float32),
+                                       n.astype(xp.float32),
+                                       e[J], bt[J], s, xp)
             hit[J] = True
 
-    # CYLX
-    mx = (t==1)
-    if mx.any():
+    # ========== CYLX (t==1) ==========
+    mx = (t == 1)
+    if bool(mx.any()):
         I = xp.where(mx)[0]
-        C = G['cyl_c'][idx[I]]; R = G['cyl_R'][idx[I]]; L = G['cyl_L'][idx[I]]
+        C = G['cyl_c'][idx[I]]
+        R = G['cyl_R'][idx[I]]
+        L = G['cyl_L'][idx[I]]
         X = p_new[I]
-        over = xp.abs(X[:,0]-C[:,0]) > (L*0.5)
-        if over.any():
+
+        # caps (x-direction)
+        over = xp.abs(X[:,0] - C[:,0]) > (L * 0.5)
+        if bool(over.any()):
             J = I[over]
             XJ = p_corr[J]
-            sign = xp.sign(XJ[:,0]-G['cyl_c'][idx[J],0])
-            XJ[:,0] = G['cyl_c'][idx[J],0] + sign*(G['cyl_L'][idx[J]]*0.5)
+            d  = XJ[:,0] - G['cyl_c'][idx[J],0]
+            sign = xp.sign(d)
+            sign = xp.where(sign == 0, xp.ones_like(sign), sign)
+            XJ[:,0] = G['cyl_c'][idx[J],0] + sign * (G['cyl_L'][idx[J]] * 0.5)
             n = xp.zeros_like(XJ); n[:,0] = sign
-          # ... ai n shape (M,3) cu n[:,0]=±1, restul 0 ...
-            enJ  = e[J].astype(xp.float32)
-            btJ  = bt[J].astype(xp.float32)
-            s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
-            v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
-                                            n.astype(xp.float32),
-                                            enJ, btJ, s, xp)
+            n = _unit(n, xp)
+            v_corr[J] = wall_bounce_ou(v[J].astype(xp.float32),
+                                       n.astype(xp.float32),
+                                       e[J], bt[J], s, xp)
             p_corr[J] = XJ
             hit[J] = True
+
+        # mantle (radial in y-z)
         I2 = xp.where(mx & (~hit))[0]
-        if I2.size>0:
+        if I2.size > 0:
             C2 = G['cyl_c'][idx[I2]]; R2 = G['cyl_R'][idx[I2]]
             X2 = p_new[I2]
             ry = X2[:,1]-C2[:,1]; rz = X2[:,2]-C2[:,2]
-            r = xp.sqrt(ry*ry+rz*rz)
-            out = r>R2
-            if out.any():
+            r  = xp.sqrt(ry*ry + rz*rz)
+            out = r > R2
+            if bool(out.any()):
                 J = I2[out]
-                C3 = G['cyl_c'][idx[J]]; R3=G['cyl_R'][idx[J]]
+                C3 = G['cyl_c'][idx[J]]; R3 = G['cyl_R'][idx[J]]
                 XJ = p_corr[J]
                 ry = XJ[:,1]-C3[:,1]; rz = XJ[:,2]-C3[:,2]
-                r = xp.sqrt(ry*ry+rz*rz)
-                n = xp.stack([xp.zeros(J.size,dtype=xp.float32), ry/r, rz/r], axis=1)
-                XJ[:,1] = C3[:,1] + R3*(ry/r)
-                XJ[:,2] = C3[:,2] + R3*(rz/r)
-                # n = [0, ry/r, rz/r], shape (M,3) deja construit
-                enJ  = e[J].astype(xp.float32)
-                btJ  = bt[J].astype(xp.float32)
-                s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
-                v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
-                                                n.astype(xp.float32),
-                                                enJ, btJ, s, xp)
+                r  = xp.sqrt(ry*ry + rz*rz)
+                r  = xp.maximum(r, xp.asarray(1e-12, dtype=r.dtype))
+                # snap to circle
+                XJ[:,1] = C3[:,1] + R3 * (ry/r)
+                XJ[:,2] = C3[:,2] + R3 * (rz/r)
+                # recompute normal AFTER snap
+                ry = XJ[:,1]-C3[:,1]; rz = XJ[:,2]-C3[:,2]
+                r  = xp.sqrt(ry*ry + rz*rz)
+                r  = xp.maximum(r, xp.asarray(1e-12, dtype=r.dtype))
+                n  = xp.stack([xp.zeros(J.size, dtype=xp.float32), ry/r, rz/r], axis=1)
+                n  = _unit(n, xp)
+                v_corr[J] = wall_bounce_ou(v[J].astype(xp.float32),
+                                           n.astype(xp.float32),
+                                           e[J], bt[J], s, xp)
                 p_corr[J] = XJ
                 hit[J] = True
 
-    # CYLY
-    my = (t==2)
-    if my.any():
+    # ========== CYLY (t==2) ==========
+    my = (t == 2)
+    if bool(my.any()):
         I = xp.where(my)[0]
-        C = G['cyl_c'][idx[I]]; R = G['cyl_R'][idx[I]]; L = G['cyl_L'][idx[I]]
+        C = G['cyl_c'][idx[I]]
+        R = G['cyl_R'][idx[I]]
+        L = G['cyl_L'][idx[I]]
         X = p_new[I]
-        over = xp.abs(X[:,1]-C[:,1]) > (L*0.5)
-        if over.any():
+
+        # caps (y-direction)
+        over = xp.abs(X[:,1] - C[:,1]) > (L * 0.5)
+        if bool(over.any()):
             J = I[over]
             XJ = p_corr[J]
-            sign = xp.sign(XJ[:,1]-G['cyl_c'][idx[J],1])
-            XJ[:,1] = G['cyl_c'][idx[J],1] + sign*(G['cyl_L'][idx[J]]*0.5)
+            d  = XJ[:,1] - G['cyl_c'][idx[J],1]
+            sign = xp.sign(d)
+            sign = xp.where(sign == 0, xp.ones_like(sign), sign)
+            XJ[:,1] = G['cyl_c'][idx[J],1] + sign * (G['cyl_L'][idx[J]] * 0.5)
             n = xp.zeros_like(XJ); n[:,1] = sign
-            enJ  = e[J].astype(xp.float32)
-            btJ  = bt[J].astype(xp.float32)
-            s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
-            v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
-                                            n.astype(xp.float32),
-                                            enJ, btJ, s, xp)
-
+            n = _unit(n, xp)
+            v_corr[J] = wall_bounce_ou(v[J].astype(xp.float32),
+                                       n.astype(xp.float32),
+                                       e[J], bt[J], s, xp)
             p_corr[J] = XJ
             hit[J] = True
+
+        # mantle (radial in x-z)
         I2 = xp.where(my & (~hit))[0]
-        if I2.size>0:
-            C2 = G['cyl_c'][idx[I2]]; R2=G['cyl_R'][idx[I2]]
+        if I2.size > 0:
+            C2 = G['cyl_c'][idx[I2]]; R2 = G['cyl_R'][idx[I2]]
             X2 = p_new[I2]
             rx = X2[:,0]-C2[:,0]; rz = X2[:,2]-C2[:,2]
-            r = xp.sqrt(rx*rx+rz*rz)
-            out = r>R2
-            if out.any():
+            r  = xp.sqrt(rx*rx + rz*rz)
+            out = r > R2
+            if bool(out.any()):
                 J = I2[out]
-                C3 = G['cyl_c'][idx[J]]; R3=G['cyl_R'][idx[J]]
+                C3 = G['cyl_c'][idx[J]]; R3 = G['cyl_R'][idx[J]]
                 XJ = p_corr[J]
                 rx = XJ[:,0]-C3[:,0]; rz = XJ[:,2]-C3[:,2]
-                r = xp.sqrt(rx*rx+rz*rz)
-                n = xp.stack([rx/r, xp.zeros(J.size,dtype=xp.float32), rz/r], axis=1)
-                XJ[:,0] = C3[:,0] + R3*(rx/r)
-                XJ[:,2] = C3[:,2] + R3*(rz/r)
-                enJ  = e[J].astype(xp.float32)
-                btJ  = bt[J].astype(xp.float32)
-                s    = xp.sqrt(xp.asarray(G['kT_over_m'], dtype=xp.float32))
-                v_corr[J] = ou_bounce_vectorized(v[J].astype(xp.float32),
-                                                n.astype(xp.float32),
-                                                enJ, btJ, s, xp)
+                r  = xp.sqrt(rx*rx + rz*rz)
+                r  = xp.maximum(r, xp.asarray(1e-12, dtype=r.dtype))
+                # snap to circle
+                XJ[:,0] = C3[:,0] + R3 * (rx/r)
+                XJ[:,2] = C3[:,2] + R3 * (rz/r)
+                # recompute normal AFTER snap
+                rx = XJ[:,0]-C3[:,0]; rz = XJ[:,2]-C3[:,2]
+                r  = xp.sqrt(rx*rx + rz*rz)
+                r  = xp.maximum(r, xp.asarray(1e-12, dtype=r.dtype))
+                n  = xp.stack([rx/r, xp.zeros(J.size, dtype=xp.float32), rz/r], axis=1)
+                n  = _unit(n, xp)
+                v_corr[J] = wall_bounce_ou(v[J].astype(xp.float32),
+                                           n.astype(xp.float32),
+                                           e[J], bt[J], s, xp)
                 p_corr[J] = XJ
                 hit[J] = True
+
     return p_corr, v_corr, hit
 
-
 def reflect_gpu(p_old, p_new, v, prev_idx, G, xp):
+    """
+    Same signature as your reflect_gpu, but uses:
+      - inside_masks_xp(P, G, xp)  (must exist in your script)
+      - locate_points_in_pieces_xp  (random tie-break)
+      - collide_one_piece_gpu
+    """
     in_union = inside_masks_xp(p_new, G, xp).any(axis=0)
-    new_idx = locate_points_in_pieces_xp(p_new, G, xp)
-    crossed = (new_idx != prev_idx)
+    new_idx  = locate_points_in_pieces_xp(p_new, G, xp)
+    crossed  = (new_idx != prev_idx)
+
     need = (~in_union)
-    if need.any():
+    if bool(need.any()):
         I = xp.where(need)[0]
         p_corr, v_corr, hit = collide_one_piece_gpu(p_old[I], p_new[I], v[I], prev_idx[I], G, xp)
         sel = I[hit]
-        if sel.size>0:
-            p_new[sel] = p_corr[hit]
-            v[sel]     = v_corr[hit]
+        if sel.size > 0:
+            p_new[sel]   = p_corr[hit]
+            v[sel]       = v_corr[hit]
             new_idx[sel] = prev_idx[sel]
             crossed[sel] = False
         sel2 = I[~hit]
-        if sel2.size>0:
-            p_new[sel2] = p_old[sel2]
-            v[sel2] *= 1
+        if sel2.size > 0:
+            # fallback: no dissipation/fridge
+            p_new[sel2]   = p_old[sel2]
+            # v[sel2]    *= 1.0  # keep velocity unchanged
             new_idx[sel2] = prev_idx[sel2]
             crossed[sel2] = False
+
     return p_new, v, new_idx, crossed
 
 # ---------- sampling inițial ----------

@@ -31,24 +31,24 @@ class CFG:
     CUB1 = (-120.0,  70.0, 0.0)
     CUB2 = ( 120.0,  70.0, 0.0)
 
-    FUNNEL_Y =  70.0
+    FUNNEL_Y =  90.0
     FUNNEL_Z =   0.0
     FUNNEL_SEG = 6
-    FUNNEL_RAD = [8.0, 35.0, 40.0, 30.0, 22.0, 10.0]
+    FUNNEL_RAD = [8.0, 17.0, 25.0, 15.0, 12.0, 10.0]
     FUNNEL_PAD = 2.0
     SEAL_OVERLAP = 6.0
 
-    LOOP_Y   = -55.0
+    LOOP_Y   = 45.0
     VERT_R   = 12.0
-    RET_R    = 42.0
-    RET_EXTRA= 65.0
+    RET_R    = 12.0
+    RET_EXTRA= 10.0
 
     # Materiale pe piesă
-    MAT_CUBE_L = dict(e_n=0.65, beta_t=0.35)
-    MAT_CUBE_R = dict(e_n=0.05, beta_t=0.95)
-    MAT_FUN  = [dict(e_n=0.3, beta_t=0.4),dict(e_n=0.9, beta_t=0.115),dict(e_n=0.9, beta_t=0.115),dict(e_n=0.9, beta_t=0.115),dict(e_n=0.9, beta_t=0.115),dict(e_n=0.9, beta_t=0.115)]
-    MAT_VERT = dict(e_n=0.98, beta_t=0.015)
-    MAT_RET  = dict(e_n=0.98, beta_t=0.015)
+    MAT_CUBE_L = dict(e_n=0.9, beta_t=0.7)
+    MAT_CUBE_R = dict(e_n=0.3, beta_t=0.55)
+    MAT_FUN  = [dict(e_n=0.85, beta_t=0.85),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3),dict(e_n=0.98, beta_t=0.3)]
+    MAT_VERT = dict(e_n=0.98, beta_t=0.02)
+    MAT_RET  = dict(e_n=0.98, beta_t=0.02)
 
     # Simulare (default)
     N          = 30000
@@ -61,7 +61,7 @@ class CFG:
     SEED       = 42
 
     # I/O
-    OUT_DIR  = "sim/out_langevin_stab_gpu_fast_4"
+    OUT_DIR  = "sim/out_langevin_stab_gpu_fast_16"
     GSD_NAME = "run.gsd"
     XYZ_NAME = "run.xyz"
 
@@ -81,6 +81,62 @@ class CFG:
 # map tipuri piese
 PIECE_TYPES = {"box":0, "cylx":1, "cyly":2}
 
+
+# -------------------- OBJ preview (translucid) --------------------
+def write_obj(objp, mtlp, pieces, alpha=0.4, sides=96):
+    # doar preview simplu: cilindri cu capace, cuburi cu fețe
+    with open(mtlp,"w") as m:
+        m.write(f"newmtl cube\nKd 0.7 0.7 0.95\nd {alpha}\nillum 2\n\n")
+        m.write(f"newmtl funnel\nKd 0.7 0.95 0.7\nd {alpha}\nillum 2\n\n")
+        m.write(f"newmtl vert\nKd 0.95 0.95 0.7\nd {alpha}\nillum 2\n\n")
+        m.write(f"newmtl ret\nKd 0.95 0.7 0.7\nd {alpha}\nillum 2\n\n")
+    def add_box(f, base, center, size, mat, name):
+        cx,cy,cz=center; sx,sy,sz=size
+        x0,x1=cx-sx/2,cx+sx/2; y0,y1=cy-sy/2,cy+sy/2; z0,z1=cz-sz/2,cz+sz/2
+        V=[(x0,y0,z0),(x1,y0,z0),(x1,y1,z0),(x0,y1,z0),
+           (x0,y0,z1),(x1,y0,z1),(x1,y1,z1),(x0,y1,z1)]
+        F=[(0,1,2),(0,2,3),(4,6,5),(4,7,6),(0,4,5),(0,5,1),
+           (1,5,6),(1,6,2),(2,6,7),(2,7,3),(3,7,4),(3,4,0)]
+        f.write(f"o {name}\nusemtl {mat}\n")
+        for v in V: f.write(f"v {v[0]} {v[1]} {v[2]}\n")
+        for a,b,c in F: f.write(f"f {a+1+base} {b+1+base} {c+1+base}\n")
+        return base+len(V)
+    def add_cylx(f, base, cx,cy,cz,R,L, mat, name):
+        x0,x1=cx-L/2,cx+L/2
+        # inele
+        r0=[(x0, cy+R*math.cos(2*math.pi*i/sides), cz+R*math.sin(2*math.pi*i/sides)) for i in range(sides)]
+        r1=[(x1, cy+R*math.cos(2*math.pi*i/sides), cz+R*math.sin(2*math.pi*i/sides)) for i in range(sides)]
+        V=r0+r1
+        f.write(f"o {name}\nusemtl {mat}\n")
+        for v in V: f.write(f"v {v[0]} {v[1]} {v[2]}\n")
+        b=base
+        for i in range(sides):
+            a=b+i; c=b+sides+((i+1)%sides); d=b+sides+i; e=b+((i+1)%sides)
+            f.write(f"f {a+1} {e+1} {c+1}\n"); f.write(f"f {a+1} {c+1} {d+1}\n")
+        return base+len(V)
+    def add_cyly(f, base, cx,cy,cz,R,L, mat, name):
+        y0,y1=cy-L/2,cy+L/2
+        r0=[(cx+R*math.cos(2*math.pi*i/sides), y0, cz+R*math.sin(2*math.pi*i/sides)) for i in range(sides)]
+        r1=[(cx+R*math.cos(2*math.pi*i/sides), y1, cz+R*math.sin(2*math.pi*i/sides)) for i in range(sides)]
+        V=r0+r1
+        f.write(f"o {name}\nusemtl {mat}\n")
+        for v in V: f.write(f"v {v[0]} {v[1]} {v[2]}\n")
+        b=base
+        for i in range(sides):
+            a=b+i; c=b+sides+((i+1)%sides); d=b+sides+i; e=b+((i+1)%sides)
+            f.write(f"f {a+1} {c+1} {e+1}\n"); f.write(f"f {a+1} {d+1} {c+1}\n")
+        return base+len(V)
+    with open(objp,"w") as f:
+        f.write(f"mtllib {os.path.basename(mtlp)}\n")
+        base=0
+        for S in pieces:
+            if S["type"]=="box":
+                base=add_box(f, base, S["center"], S["size"], S["e_n"], S["name"])
+            elif S["type"]=="cylx":
+                base=add_cylx(f, base, S["cx"],S["cy"],S["cz"],S["R"],S["L"], S["e_n"], S["name"])
+            else:
+                base=add_cyly(f, base, S["cx"],S["cy"],S["cz"],S["R"],S["L"], S["e_n"], S["name"])
+
 # ------------- Geometrie & materiale -------------
 
 def make_geometry():
@@ -93,9 +149,11 @@ def make_geometry():
     x2 = W.CUB2[0] - W.CUBE[0]/2
     dist = x2 - x1
     seg  = dist / W.FUNNEL_SEG
+    segi  = [seg+20, seg-10, seg-10, seg-10, seg-10, seg+20]
+
     for i, R in enumerate(W.FUNNEL_RAD):
         cx = x1 + (i+0.5)*seg
-        L  = seg + 2*W.FUNNEL_PAD + 2*W.SEAL_OVERLAP
+        L  = segi[i] + 2*W.FUNNEL_PAD + 2*W.SEAL_OVERLAP
         pieces.append(dict(type='cylx', cx=cx, cy=W.FUNNEL_Y, cz=W.FUNNEL_Z, R=R, L=L,
                            **W.MAT_FUN[i], name=f'FUN_{i+1}'))
 
@@ -105,14 +163,14 @@ def make_geometry():
     y_bot1 = W.LOOP_Y - W.SEAL_OVERLAP
     L1 = abs(y_top1 - y_bot1); cy1 = 0.5*(y_top1+y_bot1)
 
-    y_top2 = yb2 + W.SEAL_OVERLAP
-    y_bot2 = W.LOOP_Y - W.SEAL_OVERLAP
-    L2 = abs(y_top2 - y_bot2); cy2 = 0.5*(y_top2+y_bot2)
+    # y_top2 = yb2 + W.SEAL_OVERLAP
+    # y_bot2 = W.LOOP_Y - W.SEAL_OVERLAP
+    # L2 = abs(y_top2 - y_bot2); cy2 = 0.5*(y_top2+y_bot2)
 
-    pieces.append(dict(type='cyly', cx=W.CUB1[0], cy=cy1, cz=0.0, R=W.VERT_R, L=L1,
-                       **W.MAT_VERT, name='VERT_L'))
-    pieces.append(dict(type='cyly', cx=W.CUB2[0], cy=cy2, cz=0.0, R=W.VERT_R, L=L2,
-                       **W.MAT_VERT, name='VERT_R'))
+    # pieces.append(dict(type='cyly', cx=W.CUB1[0], cy=cy1, cz=0.0, R=W.VERT_R, L=L1,
+    #                    **W.MAT_VERT, name='VERT_L'))
+    # pieces.append(dict(type='cyly', cx=W.CUB2[0], cy=cy2, cz=0.0, R=W.VERT_R, L=L2,
+    #                    **W.MAT_VERT, name='VERT_R'))
 
     xR0 = x1 - W.RET_EXTRA
     xR1 = x2 + W.RET_EXTRA
@@ -583,6 +641,11 @@ def main():
 
     pieces = make_geometry(); names = piece_names(pieces)
 
+    # OBJ preview
+    write_obj(os.path.join(CFG.OUT_DIR,"geom.obj"),
+              os.path.join(CFG.OUT_DIR,"geom.mtl"),
+              pieces, alpha=0.45)
+    
     # init
     pos0 = sample_uniform_in_union(args.n, pieces, seed=args.seed)
     vel0 = np.zeros_like(pos0, dtype=np.float32)
