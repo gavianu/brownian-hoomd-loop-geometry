@@ -30,3 +30,8 @@
 ## Status fișiere LaTeX în workspace-ul curent
 - Căutarea `.tex` în snapshot-ul actual nu a returnat fișiere.
 - Prin urmare, orice referință la `main.tex`/lucrare este **context extern** și rămâne **de confirmat manual**.
+
+
+## Knowledge & prompts (nou)
+- Knowledge pack: `docs/domain_knowledge.md`, `docs/model_assumptions.md`, `docs/common_pitfalls.md`, `docs/experiments.md`, `docs/roadmap.md`.
+- Prompturi reutilizabile: `prompts/continue_from_baseline.md`, `prompts/review_physics.md`, `prompts/review_simulation.md`.
