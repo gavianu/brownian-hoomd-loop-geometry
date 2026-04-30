@@ -1,0 +1,36 @@
+# Baseline de referință: cazul simplu al lucrării.
+# Verifică echilibrul termic: <v^2> = 3 kT/m după relaxare.
+
+geometry:
+  preset: simple_box
+  params:
+    size: [100.0, 100.0, 100.0]
+    center: [0.0, 0.0, 0.0]
+    material:
+      e_n: 0.95
+      beta_t: 0.95
+
+wall_model: ou
+
+simulation:
+  n_particles: 5000
+  steps: 5000
+  dt: 0.01
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 500
+  log_every: 200
+
+output:
+  dir: sim_out/baseline_simple_box
+  gsd: true
+  csv: true
+  gsd_subset: 2000
+  box: [120.0, 120.0, 120.0]  # vizual (OVITO); acoperă domeniul

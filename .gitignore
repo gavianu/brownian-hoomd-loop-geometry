@@ -5,6 +5,14 @@ __pycache__/
 
 *out*
 *out*/*.*
+sim_out/
+
+# Private correspondence (nu se urcă pe GitHub)
+WhatsApp Chat*.zip
+whatsapp_chat/
+
+# Build artefacte
+*.egg-info/
 
 # C extensions
 *.so

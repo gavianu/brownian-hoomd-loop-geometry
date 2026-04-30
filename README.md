@@ -1,51 +1,93 @@
 # brownian-hoomd-loop-geometry
 
-## Scopul proiectului
-Acest repository investighează mișcarea Browniană/Langevin a unor traceri într-o geometrie internă compusă (camere + segmente tip funnel + canale de retur), cu accent pe efectele combinate dintre geometrie, materialul frontierei și termalizarea stochastică.
+Simulare Brownian/Langevin a unui gaz ideal în geometrii de confinare complexe, cu pereți având proprietăți materiale și termice diferite. Cod de bază pentru lucrarea de licență (UB Fizică, iunie 2026).
 
-## Rezumat fizic scurt
-Modelul implementat tratează traceri ca gaz ideal diluat (fără interacțiuni tracer–tracer explicite în scripturile principale), cu dinamică Langevin în volum și coliziuni la perete controlate de parametri materiali (coeficient normal `e_n`, factor tangențial `beta_t`).
+## Structură
 
-Ideea centrală este **gaz ideal în geometrie complexă cu frontiere materiale diferite**: comportamentul emergent nu este atribuit exclusiv formei geometrice, ci și legii de interacție cu peretele.
+```
+brownian_sim/                   # pachetul Python (SOLID, extensibil)
+├── geometry/                   # primitive (Box, CylX, CylY) + Assembly
+│   └── presets/                # geometrii predefinite (simple_box, loop_chambers)
+├── materials/                  # WallMaterial (e_n, beta_t)
+├── physics/                    # wall_models, Langevin, backend numpy/cupy
+├── simulation/                 # engine, sampler, substepping
+├── io/                         # writers GSD + CSV
+├── analysis/                   # MSD, tranziții, echilibru, statistici perete
+└── scripts/                    # CLI entry points
 
-## Punct cheie de interpretare
-- Geometria **nu** este singura sursă a fenomenelor observate.
-- Materialele de frontieră (prin `e_n`, `beta_t`) sunt esențiale.
-- Termenii stocastici Langevin au interpretare fizică de cuplaj termic în volum.
-- Modelul de tip OU la perete este relevant pentru compatibilitate termică, dar nivelul exact al implementării trebuie verificat pe scripturile dedicate (vezi documentația din `docs/`).
-
-## Structura repo (pe scurt)
-- `sim/` — scripturi de simulare (Langevin/Brownian/MPCD), inclusiv variante CPU/GPU și versiuni experimentale.
-- `docs/` — inventar și documentație conceptuală/tehnică.
-- `ovito/` — pipeline de vizualizare/post-procesare.
-- `ness_check.py`, `sim/ness_check.py` — verificări NESS/echilibru (de confirmat diferențele exacte de rol).
-
-## Script principal probabil
-Pentru snapshot-ul curent, candidatul principal rămâne `sim/analytic_langevin.py` (susținut de cod prin structură completă: geometrie, materiale pe piese, evoluție stochastică, coliziuni și output-uri de analiză).
-
-## Rulare orientativă
-Exemplu existent (din familia principală de scripturi):
-
-```bash
-python sim/analytic_langevin_termal_collission.py --gpu 0 --gpu-collide --n 30000 --steps 20000 --write-every 2000 --log-every 200
+configs/                        # YAML config-uri (reproductibile)
+tests/                          # pytest (25 teste)
+latex/                          # lucrarea LaTeX
+legacy/                         # scripturile originale, păstrate pentru referință
 ```
 
-Notă: alegerea „scriptului canonic de producție” între variantele `analytic_langevin*` este încă de confirmat manual.
+## Instalare
 
-## Stare actuală
-- Cartografierea conservatoare a fost deja făcută în `docs/repo_inventory.md`.
-- Documentația de bază este extinsă în fișierele din `docs/`.
-- Interpretările nesusținute explicit de cod sunt marcate `de confirmat manual`.
+```bash
+pip install -e .                # instalare editabilă
+pip install -e .[dev]           # + pytest pentru dezvoltare
+```
 
-## Repere de baseline (obligatoriu)
-- **Baseline logic: `052a205`**
-- **Current documentation checkpoint: `d7f4ce5`**
+## Rulare simulări
 
+Prin YAML config:
 
-## Knowledge pack pentru continuitate (nou)
-- `docs/domain_knowledge.md` — context fizic reutilizabil pentru agenți noi.
-- `docs/model_assumptions.md` — ipoteze explicite, delimitate pe nivel de certitudine.
-- `docs/common_pitfalls.md` — capcane de interpretare de evitat.
-- `docs/experiments.md` — experimente numerice recomandate pentru validare.
-- `docs/roadmap.md` — pași următori ordonați, conservatori.
-- `prompts/continue_from_baseline.md`, `prompts/review_physics.md`, `prompts/review_simulation.md` — prompturi reutilizabile pentru agenți.
+```bash
+python -m brownian_sim.scripts.run_sim --config configs/baseline_simple_box.yaml
+python -m brownian_sim.scripts.run_sim --config configs/loop_chambers_ou.yaml
+```
+
+Override pe parametri:
+
+```bash
+python -m brownian_sim.scripts.run_sim --config configs/loop_chambers_ou.yaml --steps 5000 --n 10000
+```
+
+## Testare
+
+```bash
+python -m pytest tests/
+```
+
+25 teste: geometrie (inside/wall_distance/snap), modele de perete (conservare energie elastic, MB la OU), Langevin + OU în echilibru.
+
+## Modele fizice implementate
+
+### Dinamică volum — Langevin
+```
+dv = -(γ/m) v dt + √(2γkT)/m · dW
+```
+Integrator Euler-Maruyama, parametri în YAML: `mass`, `gamma`, `kT`, `dt`.
+
+### Modele de perete (interschimbabile prin config)
+
+| Nume | Formulă | Folosire |
+|------|---------|----------|
+| `elastic` | `v' = v - 2(v·n)n` | reflexie speculară, conservă energia |
+| `damped`  | `v_n' = -e_n v_n; v_t' = β_t v_t` | disipativ, fără zgomot termic |
+| `ou`      | `v_n' = e_n\|v_n\| + √(1-e_n²)·s·ξ_n`, idem tangent | OU bounce, termalizant, FDT local |
+
+Unde `s = √(kT/m)`, iar `ξ` sunt gaussieni standard.
+
+## Extensibilitate
+
+**Geometrie nouă:** scrie o clasă care moștenește `Primitive` în `brownian_sim/geometry/primitives.py`, sau un preset nou în `brownian_sim/geometry/presets/`.
+
+**Wall model nou:** scrie o clasă care moștenește `WallModel` în `brownian_sim/physics/wall_models.py` și adaug-o în `make_wall_model()`.
+
+Engine-ul și restul codului nu se schimbă.
+
+## Context fizic
+
+Modelul pornește de la o întrebare veche: poate geometria + materiale asimetrice să producă NESS (dezechilibru staționar) într-un gaz ideal? Răspuns final (coerent cu principiul 2): **nu**, dacă pereții sunt termalizanți corect (OU bounce) sistemul relaxează către echilibru. NESS real necesită dezechilibru extern (al 2-lea termostat sau sistem deschis).
+
+## Rezultate validare (refactor vs legacy)
+
+- `<v²>` la echilibru = 3.016 (țintă 3.000 pentru kT=m=1)  ✓
+- Niciun drift sistematic per-axă
+- Niciun OUT (particule pierdute) în loop_chambers
+- 62× mai rapid decât legacy CPU la aceiași parametri
+
+## Legacy
+
+Scripturile originale din `sim/` sunt păstrate în `legacy/sim_scripts/` ca referință istorică. Vezi `legacy/README.md` pentru mapare pe script.

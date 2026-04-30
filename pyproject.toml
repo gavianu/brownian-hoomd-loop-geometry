@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brownian-sim"
+version = "0.1.0"
+description = "Simulare dinamică Langevin a unui gaz ideal în geometrii de confinare complexe"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Octavian Stirbei" }]
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "gsd>=3.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+gpu = ["cupy-cuda12x>=13"]
+viz = ["ovito>=3.10"]
+dev = ["pytest>=7.0", "pytest-cov"]
+
+[project.scripts]
+brownian-run = "brownian_sim.scripts.run_sim:main"
+brownian-analyze = "brownian_sim.scripts.analyze_run:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["brownian_sim*"]
+exclude = ["legacy*", "sim*", "tests*", "docs*", "latex*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"

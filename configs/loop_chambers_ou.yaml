@@ -1,0 +1,31 @@
+# Configurație principală a lucrării: 2 camere + 6 funnel + canal retur, OU bounce.
+# Parametri baseline din legacy (`analytic_langevin_termal_collission.py`).
+
+geometry:
+  preset: loop_chambers
+  # params default — vezi LoopChambersParams pentru ajustări
+
+wall_model: ou
+
+simulation:
+  n_particles: 30000
+  steps: 20000
+  dt: 0.001
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 200
+
+output:
+  dir: sim_out/loop_chambers_ou
+  gsd: true
+  csv: true
+  gsd_subset: 15000
+  box: [520.0, 320.0, 260.0]
