@@ -40,3 +40,12 @@ Notă: alegerea „scriptului canonic de producție” între variantele `analyt
 ## Repere de baseline (obligatoriu)
 - **Baseline logic: `052a205`**
 - **Current documentation checkpoint: `d7f4ce5`**
+
+
+## Knowledge pack pentru continuitate (nou)
+- `docs/domain_knowledge.md` — context fizic reutilizabil pentru agenți noi.
+- `docs/model_assumptions.md` — ipoteze explicite, delimitate pe nivel de certitudine.
+- `docs/common_pitfalls.md` — capcane de interpretare de evitat.
+- `docs/experiments.md` — experimente numerice recomandate pentru validare.
+- `docs/roadmap.md` — pași următori ordonați, conservatori.
+- `prompts/continue_from_baseline.md`, `prompts/review_physics.md`, `prompts/review_simulation.md` — prompturi reutilizabile pentru agenți.

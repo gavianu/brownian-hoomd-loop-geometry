@@ -31,3 +31,10 @@
 2. `analysis_post.py` și `analyze.py` consumă output-urile pentru metrici.
 3. `ovito_pipeline.py` oferă cale de vizualizare.
 4. `repo_inventory.md` + documentele noi din `docs/` fixează contextul baseline/checkpoint.
+
+
+## Navigare knowledge (suport documentar)
+- Cadru fizic reutilizabil: `docs/domain_knowledge.md`.
+- Ipoteze și nivel de certitudine: `docs/model_assumptions.md`.
+- Capcane de interpretare: `docs/common_pitfalls.md`.
+- Plan de validare: `docs/experiments.md` + `docs/roadmap.md`.
