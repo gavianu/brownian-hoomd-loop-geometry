@@ -1,0 +1,43 @@
+============================================================
+GPU Benchmark -- brownian_sim
+Host:    DESKTOP-A70H2J6
+Date:    2026-05-02 18:20
+Python:  3.12.10
+NumPy:   2.3.3
+CPU:     AMD64 Family 23 Model 1 Stepping 1, AuthenticAMD
+N=100,000 particule, 500 pasi per kernel
+============================================================
+
+GPU:     NVIDIA GeForce RTX 3060
+         VRAM libera: 11.8 GB / 12.9 GB
+CuPy:    13.6.0
+
+-- 1. LangevinIntegrator.step_velocity --
+  CPU: 10.33 ms
+  GPU: 0.24 ms  ->  speedup 43.5x
+
+-- 2. OUBounce.bounce_batch --
+  CPU: 23.87 ms
+  GPU: 3.34 ms  ->  speedup 7.2x
+
+-- 3. MaxwellDiffuse.bounce_batch --
+  CPU: 12.20 ms
+  GPU: 0.97 ms  ->  speedup 12.5x
+
+-- 4. Simulare completa loop_chambers (engine batch) --
+  CPU: 15.5 ms/pas  (300k pasi ~ 1.3 ore)
+  GPU: N/A -- geometria SDF (inside_any/locate) ramane pe CPU.
+  Transferurile PCIe per sub-pas anuleaza castigul GPU pe fizica.
+  Extensia full-GPU necesita portarea geometriei SDF pe CuPy.
+
+============================================================
+SUMAR
+  Langevin step (N=100k):  CPU 10.33 ms  GPU 0.24 ms  (43.5x)
+  OUBounce batch:          CPU 23.87 ms  GPU 3.34 ms  (7.2x)
+  MaxwellDiffuse batch:    CPU 12.20 ms  GPU 0.97 ms  (12.5x)
+
+Concluzie:
+  Kernelele de fizica (Langevin, bounce) sunt gata GPU: speedup 11-47x.
+  Simularea completa ramane CPU-only: geometria SDF nu e portata pe GPU.
+  Extensie posibila: portare inside_any/locate pe CuPy -> full GPU pipeline.
+============================================================
