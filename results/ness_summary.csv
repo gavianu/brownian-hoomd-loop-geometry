@@ -8,8 +8,8 @@ loop_damped_hetero_ballistic,30000,2913,+2.4152e-02,3.019e-03,2.276e-03,NESS
 loop_damped_uniform_ballistic,30000,3069,+2.0674e-02,2.584e-03,1.707e-03,NESS
 loop_elastic_ballistic,30000,3315,+1.8289e-02,2.286e-03,1.319e-03,NESS
 loop_maxwell_ballistic,30000,1797,+1.0300e-02,1.287e-03,4.264e-04,NESS
-loop_maxwell_hetero_long,250000,19507,+4.1550e-03,5.194e-04,6.437e-05,NESS
-loop_maxwell_hetero_short,30000,2539,-1.5230e-03,1.904e-04,1.021e-05,NESS
+loop_maxwell_hetero_long,260000,20365,+3.3933e-03,4.242e-04,4.284e-05,NESS
+loop_maxwell_hetero_short,0,54,+2.8279e-01,3.535e-02,2.769e-01,NESS
 loop_ou_hetero_ballistic,30000,2337,+1.9654e-02,2.457e-03,1.462e-03,NESS
 loop_ou_hetero_long,300000,32093,-1.4070e-03,1.759e-04,7.257e-06,NESS
 loop_ou_uniform_long,300000,32326,+2.3138e-03,2.892e-04,1.941e-05,NESS

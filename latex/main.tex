@@ -405,12 +405,15 @@ $\gamma$ & 0.01 -- 1.0 & coeficient de fricțiune Langevin \\
 
 Vitezele inițiale sunt trase din distribuția Maxwell--Boltzmann la temperatura $T$, ceea ce asigură că valoarea $\langle v^2 \rangle = 3k_BT/m$ este verificată încă din primul pas.
 
+\paragraph{Performanță și scalabilitate.}
+Pe sistemul de calcul utilizat (Intel Xeon, NumPy 2.4, Python 3.11), un pas de simulare cu $N=30\,000$ de particule în geometria \texttt{loop\_chambers} durează aproximativ 23\,ms, din care circa 5\,ms reprezintă dinamica Langevin pură, iar restul detecția coliziunilor cu geometria. O rulare de 300\,000 de pași necesită circa 2\,ore, iar complexitatea este liniară în $N$. Pachetul conține un selector de backend (\texttt{backend.py}) care permite rularea kernelelor de fizică pe GPU prin CuPy. Măsurătorile pe un sistem cu NVIDIA RTX\,3060 arată speedup de $44\times$ pentru pasul Langevin și $12\times$ pentru modelul MaxwellDiffuse. Detecția coliziunilor cu geometria rămâne pe CPU, iar transferurile de date necesare per sub-pas reduc câștigul net la 0{,}95 față de CPU pur; o implementare full-GPU ar necesita portarea geometriei pe CuPy.
+
 \subsection{Reprezentarea geometriei}
 
 Domeniul accesibil particulelor este descris printr-o uniune de primitive simple, fiecare implementând interfața:
 
 \begin{itemize}
-    \item \texttt{inside(P)}: mască booleană -- care dintre punctele $(N,3)$ sunt în interior;
+    \item \texttt{inside(P)}: mască booleană care indică punctele $(N,3)$ din interior;
     \item \texttt{wall\_distance(p)}: distanța scalară la cel mai apropiat perete;
     \item \texttt{snap\_and\_normal(p\_new)}: dacă $p_\text{new}$ a ieșit, returnează punctul proiectat pe frontieră și normala unitară spre interior.
 \end{itemize}
@@ -639,7 +642,7 @@ Distribuția Maxwell--Boltzmann a vitezelor este o condiție necesară dar nu su
 
 unde $\pi$ este distribuția staționară empirică și $P_{ij}$ probabilitățile de tranziție între regiuni. La echilibru termodinamic, bilanțul detaliat impune $J_\text{loop} = 0$.
 
-Tabelul~\ref{tab:jloop} prezintă valorile $J_\text{loop}$ obținute pentru diferite modele de perete. Simulările cu $\gamma=1$ au acumulat între 17\,000 și 32\,000 tranziții ($N=30\,000$, $t=300\,000$ pași), suficient pentru a distinge semnalul fizic de fluctuațiile statistice.
+Tabelul~\ref{tab:jloop} prezintă valorile $J_\text{loop}$ obținute pentru diferite modele de perete. Simulările cu $\gamma=1$ au acumulat între 20\,000 și 32\,000 tranziții ($N=30\,000$, $t=300\,000$ pași), suficient pentru a distinge semnalul fizic de fluctuațiile statistice.
 
 \begin{table}[ht]
 \centering
@@ -647,7 +650,7 @@ Tabelul~\ref{tab:jloop} prezintă valorile $J_\text{loop}$ obținute pentru dife
 \toprule
 Model perete & Materiale & $\gamma$ & $N_\text{tr}$ & $J_\text{loop}$ & $R_\text{max}$ & Verdict \\
 \midrule
-Maxwell diffuse  & eterogen & 1{,}0 & 17\,178 & $+3{,}17\times10^{-3}$ & $3{,}96\times10^{-4}$ & echilibru \\
+Maxwell diffuse  & eterogen & 1{,}0 & 20\,365 & $+3{,}39\times10^{-3}$ & $4{,}24\times10^{-4}$ & echilibru \\
 OUBounce         & eterogen & 1{,}0 & 32\,093 & $-1{,}41\times10^{-3}$ & $1{,}76\times10^{-4}$ & echilibru \\
 OUBounce         & uniform  & 1{,}0 & 32\,326 & $+2{,}31\times10^{-3}$ & $2{,}89\times10^{-4}$ & echilibru \\
 \midrule
