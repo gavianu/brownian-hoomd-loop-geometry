@@ -1,0 +1,41 @@
+============================================================
+GPU Benchmark -- brownian_sim
+Host:    DESKTOP-A70H2J6
+Date:    2026-05-02 17:57
+Python:  3.12.10
+NumPy:   2.3.3
+CPU:     AMD64 Family 23 Model 1 Stepping 1, AuthenticAMD
+N=100,000 particule, 500 pasi per kernel
+============================================================
+
+GPU:     NVIDIA GeForce RTX 3060
+         VRAM libera: 11.8 GB / 12.9 GB
+CuPy:    13.6.0
+
+-- 1. LangevinIntegrator.step_velocity --
+  CPU: 10.75 ms
+  GPU: 0.23 ms  ->  speedup 46.8x
+
+-- 2. OUBounce.bounce_batch --
+  CPU: 24.03 ms
+  GPU: 3.93 ms  ->  speedup 6.1x
+
+-- 3. MaxwellDiffuse.bounce_batch --
+  CPU: 12.79 ms
+  GPU: 1.10 ms  ->  speedup 11.6x
+
+-- 4. Simulare completa loop_chambers (engine batch) --
+  CPU: 14.5 ms/pas  (300k pasi ~ 1.2 ore)
+  GPU: 78.5 ms/pas  (300k pasi ~ 6.5 ore)
+  Speedup simulare completa: 0.2x
+  Nota: bottleneck ramas = inside_any/locate (CPU), transferuri xp<->np
+
+============================================================
+SUMAR
+  Langevin step (N=100k):  CPU 10.75 ms  GPU 0.23 ms  (46.8x)
+  OUBounce batch:          CPU 24.03 ms  GPU 3.93 ms  (6.1x)
+  MaxwellDiffuse batch:    CPU 12.79 ms  GPU 1.10 ms  (11.6x)
+
+Nota: inside_any si locate raman pe CPU (geometrie SDF).
+Urmatorul pas: vectorizare inside_batch cu xp pentru full GPU.
+============================================================
