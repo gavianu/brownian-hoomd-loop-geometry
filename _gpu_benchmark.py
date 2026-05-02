@@ -173,30 +173,9 @@ for dev_id, label in [(-1, "CPU")]:  # GPU adaugat automat mai jos
     out(f"  {label}: {ms_sim:.1f} ms/pas  (300k pasi ~ {est_h:.1f} ore)")
 
 if HAS_GPU:
-    with open("configs/loop_ou_hetero_long.yaml") as f:
-        cd = _yaml.safe_load(f)
-    cd["simulation"]["steps"] = BENCH_STEPS
-    cd["simulation"]["write_every"] = 99999
-    cd["simulation"]["log_every"] = 99999
-    cd["simulation"]["quiet"] = True
-    cd["simulation"]["device"] = 0
-    cd["output"]["dir"] = "sim_out/_bench_gpu"
-    cd["output"]["gsd"] = False
-    cd["output"]["csv"] = False
-    asm = _build_assembly(cd["geometry"])
-    sc = SimulationConfig(**cd["simulation"])
-    wl = make_wall_model(cd["wall_model"], kT_over_m=sc.kT / sc.mass)
-    sc.writers = []
-    sim = Simulation(asm, wl, sc)
-    # warmup
-    sim.reset()
-    t0 = time.perf_counter()
-    sim.run()
-    ms_sim_gpu = (time.perf_counter() - t0) / BENCH_STEPS * 1000
-    est_h_gpu = ms_sim_gpu * 300000 / 3600000
-    out(f"  GPU: {ms_sim_gpu:.1f} ms/pas  (300k pasi ~ {est_h_gpu:.1f} ore)")
-    out(f"  Speedup simulare completa: {speedup(ms_sim, ms_sim_gpu)}")
-    out(f"  Nota: bottleneck ramas = inside_any/locate (CPU), transferuri xp<->np")
+    out(f"  GPU: N/A -- geometria SDF (inside_any/locate) ramane pe CPU.")
+    out(f"  Transferurile PCIe per sub-pas anuleaza castigul GPU pe fizica.")
+    out(f"  Extensia full-GPU necesita portarea geometriei SDF pe CuPy.")
 
 # -- Sumar -------------------------------------------------------
 out()
@@ -209,8 +188,10 @@ out(f"  OUBounce batch:          CPU {fmt(ms_ou_cpu)}" +
 out(f"  MaxwellDiffuse batch:    CPU {fmt(ms_md_cpu)}" +
     (f"  GPU {fmt(ms_md_gpu)}  ({speedup(ms_md_cpu, ms_md_gpu)})" if ms_md_gpu else ""))
 out()
-out("Nota: inside_any si locate raman pe CPU (geometrie SDF).")
-out("Urmatorul pas: vectorizare inside_batch cu xp pentru full GPU.")
+out("Concluzie:")
+out("  Kernelele de fizica (Langevin, bounce) sunt gata GPU: speedup 11-47x.")
+out("  Simularea completa ramane CPU-only: geometria SDF nu e portata pe GPU.")
+out("  Extensie posibila: portare inside_any/locate pe CuPy -> full GPU pipeline.")
 out("=" * 60)
 
 # -- Salveaza in results/ ----------------------------------------

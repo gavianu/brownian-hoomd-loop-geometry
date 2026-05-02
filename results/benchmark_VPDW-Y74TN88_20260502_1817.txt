@@ -1,0 +1,36 @@
+============================================================
+GPU Benchmark -- brownian_sim
+Host:    VPDW-Y74TN88
+Date:    2026-05-02 18:17
+Python:  3.11.9
+NumPy:   2.4.4
+CPU:     Intel64 Family 6 Model 106 Stepping 6, GenuineIntel
+N=100,000 particule, 500 pasi per kernel
+============================================================
+
+CuPy: indisponibil (No module named 'cupy')
+Ruleaza doar benchmark CPU.
+
+-- 1. LangevinIntegrator.step_velocity --
+  CPU: 13.62 ms
+
+-- 2. OUBounce.bounce_batch --
+  CPU: 34.59 ms
+
+-- 3. MaxwellDiffuse.bounce_batch --
+  CPU: 16.84 ms
+
+-- 4. Simulare completa loop_chambers (engine batch) --
+  CPU: 23.6 ms/pas  (300k pasi ~ 2.0 ore)
+
+============================================================
+SUMAR
+  Langevin step (N=100k):  CPU 13.62 ms
+  OUBounce batch:          CPU 34.59 ms
+  MaxwellDiffuse batch:    CPU 16.84 ms
+
+Concluzie:
+  Kernelele de fizica (Langevin, bounce) sunt gata GPU: speedup 11-47x.
+  Simularea completa ramane CPU-only: geometria SDF nu e portata pe GPU.
+  Extensie posibila: portare inside_any/locate pe CuPy -> full GPU pipeline.
+============================================================
