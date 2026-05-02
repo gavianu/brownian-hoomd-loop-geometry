@@ -252,6 +252,20 @@ Acest model combină trei idei fizice importante. Mai întâi, păstrează carac
 
 Importanța teoretică a acestui model este majoră. El arată că frontiera poate juca rolul unui rezervor termic local și că echilibrul sau regimul staționar al sistemului poate fi influențat nu doar de zgomotul din volum, ci și de modul în care peretele compensează disiparea pentru a nu impune artificial un regim mai rece decât cel dorit. Astfel, termenul stochastic de la perete nu trebuie interpretat ca o sursă arbitrară de agitație, ci ca mecanismul prin care contactul cu o frontieră aflată la aceeași temperatură efectivă este menținut compatibil cu disiparea indusă de ricoșeu. Această idee trebuie privită ca parte a modelului fizic al frontierei, nu ca un detaliu secundar de formulare.
 
+Un caz limită important al modelului termalizant este condiția la limită Maxwell diffuse. Spre deosebire de OUBounce, unde viteza de ieșire depinde prin termenul $e_n|v_n^\text{in}|$ de viteza incidentă, condiția Maxwell diffuse presupune că particula care lovește peretele intră în contact complet cu rețeaua termică a materialului și uită complet viteza de intrare. Viteza de ieșire este trasă independent din distribuția termică a peretelui:
+
+\begin{equation}
+    \mathbf{v}_t' \sim \mathcal{N}(0,\, k_BT/m)\text{ în planul tangent},
+    \label{eq:maxwell_diffuse_t}
+\end{equation}
+
+\begin{equation}
+    v_n' \sim \text{Rayleigh}(\sigma),\quad \sigma = \sqrt{k_BT/m},\quad v_n' > 0.
+    \label{eq:maxwell_diffuse_n}
+\end{equation}
+
+Distribuția Rayleigh pentru componenta normală — și nu semi-gaussiană — apare din ponderea cu fluxul de particule: o particulă cu viteză normală $v_n'$ mai mare traversează suprafața mai des, deci probabilitatea de emisie este proporțională cu $v_n' \exp(-v_n'^2/2\sigma^2)$, ceea ce dă exact distribuția Rayleigh. Această proprietate garantează bilanțul detaliat la nivel de coliziune individuală: rata de tranziție $\mathbf{v} \to \mathbf{v}'$ este egală cu rata inversă $\mathbf{v}' \to \mathbf{v}$, o condiție mai puternică decât simpla termalizare marginală. Consecința directă este că un sistem cu pereți Maxwell diffuse la aceeași temperatură $T$ satisface $J_\text{loop} = 0$ indiferent de geometrie sau de distribuția materialelor pe frontieră.
+
 \subsection{Echilibru statistic, distribuții staționare și presiune}
 
 În modelul analizat aici, noțiunea de echilibru statistic trebuie discutată separat pentru două niveluri. În modelul balistic cu ricoșeu elastic ideal, echilibrul înseamnă în primul rând stabilizarea distribuțiilor spațiale și absența variațiilor sistematice ale observabilelor macroscopice relevante. În modelul extins cu dinamică Langevin și perete termalizant, noțiunea de staționaritate devine mai apropiată de sensul clasic al echilibrului pentru o dinamică în contact cu un rezervor termic.
@@ -517,7 +531,7 @@ Diferența față de OUBounce este subtilă dar cu consecințe fizice clare: amb
 
 \subsection{Teste de verificare}
 
-Pachetul conține 25 de teste pytest organizate în trei fișiere corespunzând celor trei straturi ale implementării: geometrie, modele de perete și echilibru Langevin. Toate 25 trec la fiecare rulare.
+Pachetul conține 30 de teste pytest organizate în trei fișiere corespunzând celor trei straturi ale implementării: geometrie, modele de perete și echilibru Langevin. Toate 30 trec la fiecare rulare.
 
 \paragraph{Teste geometrice (15 teste).}
 Primul grup verifică proprietățile matematice ale primitivelor \texttt{Box}, \texttt{CylX}, \texttt{CylY} și ale ansamblului \texttt{loop\_chambers}. Testele acoperă:
@@ -531,7 +545,7 @@ Primul grup verifică proprietățile matematice ale primitivelor \texttt{Box}, 
 
 Aceste teste garantează că algoritmul de detecție a coliziunilor nu produce false pozitive sau negative și că normala locală este întotdeauna orientată corect spre interior, condiție necesară pentru direcționarea corectă a vitezei după ricoșeu.
 
-\paragraph{Teste modele de perete (7 teste).}
+\paragraph{Teste modele de perete (12 teste).}
 Al doilea grup verifică proprietățile fizice ale fiecărui model de ricoșeu izolat, fără dinamică Langevin.
 
 Pentru \texttt{ElasticBounce}: componenta normală a vitezei se inversează exact, componenta tangențială se conservă exact, iar energia cinetică $|\mathbf{v}'|^2 = |\mathbf{v}|^2$ este conservată pentru 50 de perechi aleatoare $(v, \hat{n})$ cu toleranță $10^{-10}$.
@@ -539,6 +553,8 @@ Pentru \texttt{ElasticBounce}: componenta normală a vitezei se inversează exac
 Pentru \texttt{DampedBounce}: cu $e_n = 0{,}5$ și $\beta_t = 1{,}0$, componenta normală se reduce la jumătate; cu $e_n = 1{,}0$ și $\beta_t = 0{,}3$, componenta tangențială se reduce la $0{,}3$ din valoarea inițială. Aceste teste verifică că parametrii materialului sunt aplicați pe axele corecte.
 
 Pentru \texttt{OUBounce}: (1) viteza normală de ieșire $v_n' = \mathbf{v}'\cdot\hat{n}$ este strict pozitivă pentru 100 de viteze incidente aleatoare — particula iese întotdeauna spre interior; (2) aplicând ricoșeul pe 5\,000 de viteze incidente gaussiene, varianța componentelor tangențiale ale vitezelor de ieșire este $\sigma^2 \in [0{,}9, 1{,}1]$, confirmând termalizarea la $k_BT/m = 1$; (3) implementarea batch (vectorizată pe $N$ particule simultan) produce aceeași statistică ca implementarea single-particle.
+
+Pentru \texttt{MaxwellDiffuse}: (1) viteza normală de ieșire este strict pozitivă pentru 200 de viteze incidente aleatoare; (2) corelația dintre $|\mathbf{v}_\text{in}|$ și componenta normală de ieșire este $|r| < 0{,}05$ pe 3\,000 de coliziuni, confirmând că viteza de ieșire este complet independentă de cea de intrare; (3) componenta normală de ieșire urmează distribuția Rayleigh: media măsurată $\bar{v}_n = \sigma\sqrt{\pi/2}$ și varianța $\sigma^2(2 - \pi/2)$ cu $\sigma = \sqrt{k_BT/m}$, verificate cu toleranță $0{,}05$; (4) componentele tangențiale au varianță $\approx k_BT/m$; (5) implementarea batch produce aceeași statistică.
 
 \paragraph{Teste echilibru Langevin (3 teste).}
 Al treilea grup verifică comportamentul termodinamic la nivel de simulare completă, nu doar la nivel de coliziune individuală.
@@ -549,7 +565,7 @@ Al treilea grup verifică comportamentul termodinamic la nivel de simulare compl
 
 \emph{Conservarea numărului de particule în geometrie complexă}: după 500 de pași în \texttt{loop\_chambers} cu 500 de particule, niciuna nu are \texttt{piece\_idx} $= -1$ (indicator de pierdere din domeniu). Acesta verifică robustețea algoritmului de reflecție la joncțiunile dintre primitive — colțuri și muchii — unde normala locală poate fi ambiguă.
 
-Împreună, cele 25 de teste acoperă separat fiecare nivel al implementării, permițând localizarea rapidă a oricărei regresii și oferind garanția că rezultatele fizice nu sunt contaminate de artefacte numerice la frontiere.
+Împreună, cele 30 de teste acoperă separat fiecare nivel al implementării, permițând localizarea rapidă a oricărei regresii și oferind garanția că rezultatele fizice nu sunt contaminate de artefacte numerice la frontiere.
 
 \section{Rezultate}
 \label{sec:rezultate}
