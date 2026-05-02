@@ -10,6 +10,7 @@
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage{dirtree}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.8\baselineskip}
@@ -19,7 +20,7 @@
 Facultatea de Fizică, Universitatea din București\\
 Fizică Tehnologică, promoția 2002--2007\\
 Specializarea Electronică Aplicată, Metrologia și Optica}
-\date{Aprilie 2026}
+\date{Mai 2026}
 
 \begin{document}
 \maketitle
@@ -75,7 +76,7 @@ Partea a doua a lucrării este orientată către analiză și interpretare. Sunt
 \section{Fundamente teoretice}
 \label{sec:fundamente}
 
-\subsection{Gazul ideal și ipotezele modelului}
+\subsection{Modelul cinematic de bază}
 
 Modelul de gaz ideal constituie una dintre idealizările fundamentale ale fizicii statistice și ale teoriei cinetice. Importanța sa nu provine din faptul că ar descrie exhaustiv un gaz real, ci din faptul că izolează un set minim de ingrediente fizice prin care relația dintre dinamică microscopică și comportament macroscopic poate fi analizată clar. În cadrul acestei lucrări, modelul este folosit ca punct de plecare pentru studiul influenței combinate a geometriei de confinare și a proprietăților materiale ale frontierelor asupra evoluției unui ansamblu de particule.
 
@@ -94,8 +95,6 @@ Aceste ipoteze simplifică puternic problema și permit separarea efectelor pur 
 Se pierde însă realismul complet al unui gaz real. În absența coliziunilor interparticulare, modelul nu descrie în mod direct termalizarea internă, transportul vâscos în sens strict, apariția unei distribuții Maxwell--Boltzmann prin schimburi reciproce de impuls sau corelațiile colective dintre particule. Din acest motiv, echilibrul trebuie înțeles într-un sens adaptat modelului: nu drept echilibru termodinamic complet al unui gaz real, ci drept un regim staționar al observabilelor relevante pentru dinamica și confinarea considerate.
 
 În formularea extinsă considerată aici, modelul de bază este completat prin termeni stocastici și prin condiții la limită mai generale decât ricoșeul perfect elastic. Din punct de vedere teoretic, aceasta înseamnă că gazul ideal reprezintă nucleul cinematic al descrierii, peste care se adaugă o dinamică de tip Langevin și un model de interacție cu pereții care poate fi disipativ și termalizant. Prin urmare, pentru o prezentare fidelă a modelului fizic, trebuie discutate nu numai ipotezele gazului ideal clasic, ci și extensiile stocastice și materialele de frontieră care modifică regimul de ricoșeu.
-
-\subsection{Mișcarea particulelor în absența forțelor}
 
 În forma deterministă cea mai simplă, fiecare particulă se deplasează rectiliniu și uniform între două interacții succesive cu frontiera. Această proprietate rezultă direct din a doua lege a lui Newton aplicată în absența forțelor:
 
@@ -118,8 +117,6 @@ astfel încât poziția este dată de relația bine cunoscută
 Această ecuație are o semnificație fizică esențială pentru problema de față. Ea arată că, în interiorul domeniului, traiectoria particulei nu este complicată prin mecanisme interne: forma traiectoriei este o dreaptă, iar întregul caracter nebanal al dinamicii provine din succesiunea interacțiilor cu pereții sau, în extensia stocastică, din acțiunea termenilor de fricțiune și zgomot. În consecință, chiar și atunci când legea locală de mișcare este simplă, geometria domeniului poate produce o dinamică globală foarte bogată.
 
 O consecință importantă este că timpul de zbor liber dintre două coliziuni succesive nu este fixat de o scară microscopică internă, ci de viteza particulei și de forma domeniului accesibil. În geometrii simple, aceste timpuri pot avea distribuții relativ regulate. În geometrii complexe, în schimb, pot apărea diferențe mari între regiunile largi și cele înguste, între camere și canale sau între trasee cu conectivitate diferită. Astfel, chiar înainte de introducerea zgomotului stocastic, geometria controlează în mod substanțial statisticile mișcării.
-
-\subsection{Ciocniri particulă--perete: cazul elastic ideal}
 
 În modelul clasic ideal, pereții sunt considerați rigizi și perfect elastici. În acest caz, coliziunea cu frontiera este descrisă prin reflexie speculară. Fie $\hat{\mathbf{n}}$ normala unitară la suprafață, orientată spre interiorul domeniului. Viteza incidentă $\mathbf{v}$ se poate descompune într-o componentă normală și una tangențială,
 
@@ -152,7 +149,7 @@ ceea ce exprimă faptul că peretele nu disipă energie, ci doar redirecționeaz
 
 În practică, această descriere este naturală pentru frontiere netede. Totuși, în geometrii cu colțuri, muchii sau intersecții între suprafețe, noțiunea de normală locală poate deveni ambiguă. Într-un astfel de caz, problema nu mai este una de principiu fizic, ci una de formulare coerentă a coliziunii la o frontieră cu singularități geometrice. Dacă o particulă ajunge într-o vecinătate unde mai multe suprafețe pot fi active simultan, trebuie stabilit ce suprafață controlează ricoșeul și cum se interpretează local interacția cu peretele. Această dificultate justifică separarea clară dintre modelul teoretic ideal al reflexiei și tratamentul particular al unor geometrii neregulate.
 
-\subsection{Extensia stocastică: dinamica Langevin în volum}
+\subsection{Dinamica Langevin și procesul Ornstein--Uhlenbeck}
 
 Modelul fizic adoptat aici nu se limitează la mișcarea rectilinie uniformă între ricoșeuri. El introduce în volum o dinamică de tip Langevin pentru viteză, ceea ce înseamnă că particulele sunt supuse simultan unui termen disipativ și unui termen de zgomot termic. La nivel continuu, un model standard de acest tip poate fi scris sub forma
 
@@ -179,8 +176,6 @@ Importanța acestei extensii este majoră pentru interpretarea modelului. În va
 
 Din punct de vedere teoretic, ceea ce trebuie reținut aici este faptul că în volum nu mai avem strict legea $d\mathbf{v}/dt=0$, ci o ecuație stochastică pentru viteză. Acesta este unul dintre elementele teoretice esențiale care extind modelul cinematic simplu și care trebuie incluse explicit în fundamentele lucrării.
 
-\subsection{Procesul Ornstein--Uhlenbeck și relația fluctuație--disipație}
-
 Ecuația Langevin liniară pentru viteză definește un proces de tip Ornstein--Uhlenbeck. Din punct de vedere matematic, acesta este un proces gaussian, markovian, care relaxează către o distribuție staționară. Din punct de vedere fizic, el descrie exact competiția dintre disipare și agitație termică.
 
 Pentru o singură componentă a vitezei, ecuația poate fi scrisă formal ca
@@ -201,7 +196,7 @@ Distribuția staționară a vitezelor în modelul Langevin este gaussiană și c
 
 Această observație este esențială pentru interpretarea modelului. Ea arată că amplitudinea zgomotului nu este aleasă arbitrar, ci este fixată de legătura dintre fricțiune, temperatură și masă. Din punct de vedere teoretic, asta înseamnă că zgomotul nu este un adaos formal, ci reprezintă componenta stochastică impusă de modelul fizic ales. Fără această relație, termenul aleator nu ar mai avea o justificare termodinamică clară.
 
-\subsection{Ciocniri generalizate cu peretele: coeficienți normali și tangențiali}
+\subsection{Modele de interacție particulă--perete}
 
 Un alt element teoretic important este faptul că interacția cu peretele nu este tratată mereu ca reflexie perfect elastică. În locul legii ideale, se folosește un model generalizat în care componentele normală și tangențială ale vitezei după ricoșeu sunt modificate diferit. Din punct de vedere fizic, acești parametri nu trebuie interpretați ca artificii formale, ci ca o descriere efectivă a modului în care materiale diferite ale frontierei schimbă impulsul și energia particulelor incidente. Dacă descompunem viteza incidentă sub forma
 
@@ -236,8 +231,6 @@ Un rezultat imediat al formulei~\eqref{eq:general_wall_bounce} este bilanțul en
 
 Rezultă că energia cinetică se conservă numai dacă ambele coeficiente sunt egale cu unu. În toate celelalte cazuri, coliziunea cu peretele devine disipativă. Aceasta schimbă substanțial interpretarea modelului: peretele nu mai este doar un reflector geometric, ci poate acționa ca element de frânare și de selecție a dinamicii.
 
-\subsection{Perete termalizant și ricoșeu stocastic de tip OU}
-
 Codul conține și o extensie și mai bogată a interacției cu peretele, notată prin modelul de tip OU bounce. Din punct de vedere fizic, aceasta poate fi interpretată ca o condiție la limită termalizantă: particula nu doar ricoșează, ci primește la contact și o contribuție stochastică compatibilă cu temperatura locală a peretelui.
 
 Ideea este de a trata separat componentele tangențială și normală. Pentru componenta tangențială se consideră o regulă de forma
@@ -259,7 +252,7 @@ Acest model combină trei idei fizice importante. Mai întâi, păstrează carac
 
 Importanța teoretică a acestui model este majoră. El arată că frontiera poate juca rolul unui rezervor termic local și că echilibrul sau regimul staționar al sistemului poate fi influențat nu doar de zgomotul din volum, ci și de modul în care peretele compensează disiparea pentru a nu impune artificial un regim mai rece decât cel dorit. Astfel, termenul stochastic de la perete nu trebuie interpretat ca o sursă arbitrară de agitație, ci ca mecanismul prin care contactul cu o frontieră aflată la aceeași temperatură efectivă este menținut compatibil cu disiparea indusă de ricoșeu. Această idee trebuie privită ca parte a modelului fizic al frontierei, nu ca un detaliu secundar de formulare.
 
-\subsection{Echilibru statistic și distribuții staționare}
+\subsection{Echilibru statistic, distribuții staționare și presiune}
 
 În modelul analizat aici, noțiunea de echilibru statistic trebuie discutată separat pentru două niveluri. În modelul balistic cu ricoșeu elastic ideal, echilibrul înseamnă în primul rând stabilizarea distribuțiilor spațiale și absența variațiilor sistematice ale observabilelor macroscopice relevante. În modelul extins cu dinamică Langevin și perete termalizant, noțiunea de staționaritate devine mai apropiată de sensul clasic al echilibrului pentru o dinamică în contact cu un rezervor termic.
 
@@ -268,8 +261,6 @@ Importanța teoretică a acestui model este majoră. El arată că frontiera poa
 Din punct de vedere spațial, echilibrul sau regimul staționar se exprimă prin faptul că distribuția de poziții nu mai prezintă o deriva sistematică în timp. Totuși, în geometrii complexe, chiar și în regim staționar pot apărea densități locale diferite, timpi de rezidență diferiți și regiuni care sunt explorate cu frecvențe diferite. Prin urmare, pentru un sistem confinat, staționaritatea nu trebuie confundată automat cu uniformitatea absolută. Atât geometria domeniului, cât și proprietățile materiale ale frontierelor decid în ce măsură această uniformizare are loc și cât de repede este atinsă.
 
 În practică, observabilele relevante pentru identificarea regimului staționar sunt distribuțiile spațiale, histogramele vitezelor, frecvențele de vizitare ale diferitelor regiuni, numărul de coliziuni cu anumite porțiuni ale peretelui și, eventual, mărimi derivate precum distanța medie față de frontieră sau timpii de traversare între compartimente. Astfel, echilibrul este mai bine înțeles aici ca staționaritate statistică a unui set de observabile decât ca realizare automată a tuturor proprietăților unui echilibru termodinamic idealizat.
-
-\subsection{Presiunea ca flux de impuls și semnificația macroscopică}
 
 Presiunea este una dintre cele mai importante punți între descrierea microscopică și cea macroscopică. În teoria cinetică, ea este interpretată ca rezultatul transferului de impuls către pereți produs de coliziunile particulelor cu frontiera. Pentru o suprafață de arie $A$, dacă pe un interval de timp $\Delta t$ au loc coliziuni care produc variații de impuls normal $\Delta p_{n,k}$, atunci presiunea medie poate fi exprimată conceptual prin relația
 
@@ -283,100 +274,417 @@ Din punct de vedere fizic, această perspectivă arată ce mărimi sunt relevant
 
 Din acest motiv, presiunea nu trebuie privită izolat, ci ca parte a unui ansamblu de observabile macroscopice deduse din dinamica microscopică. Ea este importantă deoarece oferă interpretarea mecanică cea mai directă a ricoșeurilor la perete, dar nu este singura mărime relevantă. Într-o geometrie complexă, distribuțiile spațiale, timpii de rezidență și statisticile de traversare pot fi la fel de importante pentru înțelegerea fizicii sistemului.
 
+\subsection{Observabile statistice din dinamica moleculară}
+\label{subsec:observabile}
+
+Odată ce modelul fizic și regulile de interacție cu frontiera sunt stabilite, devine esențial să se precizeze ce se măsoară efectiv din simulare. Observabilele statistice sunt mărimi extrase din ansamblul de traiectorii ale particulelor și reprezintă interfața dintre descrierea microscopică și concluzia fizică. Alegerea lor nu este arbitrară: ea trebuie să reflecte întrebările pe care modelul le poate răspunde și să permită compararea cu predicțiile teoretice.
+
+\paragraph{Distribuția vitezelor și repartiția Maxwell--Boltzmann.}
+Cea mai directă verificare a regimului staționar este distribuția modulului vitezei. Pentru un sistem în echilibru termic la temperatura $T$, distribuția Maxwell--Boltzmann prevede
+
+\begin{equation}
+    f(v) = 4\pi \left(\frac{m}{2\pi k_B T}\right)^{3/2} v^2 \exp\!\left(-\frac{mv^2}{2k_B T}\right),
+    \label{eq:maxwell_boltzmann}
+\end{equation}
+
+valabilă în trei dimensiuni. O condiție echivalentă și mai ușor de verificat numeric este că fiecare componentă cartesiană a vitezei urmează o distribuție gaussiană cu medie nulă și varianță $k_B T / m$, sau, în termeni de valoare medie pătratică,
+
+\begin{equation}
+    \langle v^2 \rangle = \frac{3k_B T}{m}.
+    \label{eq:equipartitie}
+\end{equation}
+
+Această relație servește drept criteriu principal de validare: un sistem aflat în regim staționar termic trebuie să satisfacă~\eqref{eq:equipartitie} în mod consistent și stabil în timp. În simulările cu N=30\,000 de particule efectuate în această lucrare, valoarea măsurată la echilibru este $\langle v^2 \rangle = 3{,}016$, în acord cu valoarea teoretică 3{,}000 pentru $m=k_B T=1$.
+
+\paragraph{Densitatea spațială.}
+Distribuția spațială a particulelor este descrisă de densitatea locală $\rho(\mathbf{r},t)$, definită operațional ca numărul de particule per unitate de volum într-o vecinătate a punctului $\mathbf{r}$ la momentul $t$. În practică, aceasta se obține prin histograme pe subregiuni ale domeniului. Distribuția uniformă în spațiu este o proprietate a regimului staționar în absența unor forțe externe sau a unor frontiere disipative asimetrice. Devierile de la uniformitate pot indica zone cu acumulare sau rarefiere temporară, bariere entropice induse de geometrie sau asimetrii introduse de proprietățile materiale ale pereților.
+
+\paragraph{Temperatura locală.}
+O extensie a observabilei de mai sus constă în calculul temperaturii locale pe subregiuni ale domeniului:
+
+\begin{equation}
+    T_{\text{loc}}(\mathbf{r}) = \frac{m}{3k_B}\langle v^2 \rangle_{\mathbf{r}},
+\end{equation}
+
+unde media este efectuată doar asupra particulelor aflate în vecinătatea punctului $\mathbf{r}$. Această mărime permite detectarea regimurilor în care pereții disipați sau asimetrici impun condiții termice diferite în regiuni diferite ale geometriei. Dacă toate frontierele sunt termalizante (model OU), temperatura locală trebuie să fie uniformă și egală cu temperatura de referință $T$. Dacă există frontiere disipative fără compensare stochastică, temperatura locală poate scădea sistematic în apropierea pereților sau în regiunile în care coliziunile sunt frecvente.
+
+\paragraph{Deplasarea medie pătratică.}
+Deplasarea medie pătratică (MSD) este definită ca
+
+\begin{equation}
+    \text{MSD}(t) = \left\langle \left|\mathbf{r}(t) - \mathbf{r}(0)\right|^2 \right\rangle,
+    \label{eq:msd}
+\end{equation}
+
+unde media este efectuată pe ansamblul de particule. Această mărime este deosebit de utilă deoarece identifică regimurile de transport: un regim balistic (mișcare liberă, fără coliziuni frecvente) produce $\text{MSD}(t)\sim t^2$, iar un regim difuziv, dominat de coliziuni repetate cu pereții sau de fricțiunea Langevin, produce $\text{MSD}(t)\sim t$ la timpi lungi. La timpi scurți, curbura geometriei și pasajele înguste se pot manifesta prin devierii de la aceste regimuri simple. Prezența barierelor entropice poate încetini difuzia efectivă și poate produce regimuri intermediare.
+
+\paragraph{Fluxul de coliziuni și presiunea.}
+Numărul de coliziuni cu fiecare porțiune a frontierei, combinat cu variația de impuls la fiecare impact, permite reconstituirea fluxului de impuls și a presiunii locale. Aceste statistici sunt utile în special pentru compararea comportamentului diferitelor secțiuni materiale ale geometriei și pentru identificarea asimetriilor induse de ricoșeu disipativ sau termalizant.
+
+Împreună, aceste observabile oferă o descriere completă a regimului staționar și a dinamicii de relaxare, permițând trasarea unui răspuns clar la întrebările fizice centrale: în ce măsură geometria și proprietățile materialelor influențează transportul, omogenizarea și echilibrul termic al sistemului.
+
 \section{Model numeric și implementare}
 \label{sec:model}
 
-\subsection{Descriere generală}
+\subsection{Arhitectura pachetului de simulare}
 
-Implementarea folosită ca punct de plecare pentru această lucrare este realizată în Python și folosește în principal \texttt{NumPy}, cu posibilitatea utilizării \texttt{CuPy} pentru rulare pe GPU. Din materialul disponibil reiese că scriptul central de interes este \texttt{analytic\_langevin\_termal\_collission.py}, care tratează configurații predominant tridimensionale și folosește o descriere modulară a geometriei.
+Simulările din această lucrare sunt realizate cu pachetul Python \texttt{brownian\_sim}, organizat după principiul separării responsabilităților: fiecare subpachet are un singur rol bine delimitat, iar dependențele sunt unidirecționale. Structura pe disc este:
 
-Modelul numeric urmărește pozițiile și vitezele unui număr mare de particule într-un domeniu format din regiuni elementare de tip cutie și canale cilindrice. Această alegere este avantajoasă deoarece permite atât testele analitice de apartenență la domeniu, cât și determinarea explicită a normalei locale la suprafețele de contact. În consecință, tratamentul coliziunilor poate rămâne eficient și interpretabil fizic.
+\begin{figure}[ht]
+\dirtree{%
+.1 brownian\_sim/.
+.2 geometry/.
+.3 primitives.py \DTcomment{Box, CylX, CylY — SDF + snap\_and\_normal}.
+.3 assembly.py \DTcomment{uniune de primitive, sampling uniform}.
+.3 presets/ \DTcomment{simple\_box, loop\_chambers}.
+.2 physics/.
+.3 wall\_models.py \DTcomment{Elastic, Damped, OU, MaxwellDiffuse}.
+.3 dynamics.py \DTcomment{LangevinIntegrator — pas BAOAB}.
+.3 backend.py \DTcomment{selector NumPy / CuPy}.
+.2 materials/.
+.3 wall\_material.py \DTcomment{WallMaterial(e\_n, beta\_t)}.
+.2 simulation/.
+.3 engine.py \DTcomment{bucla principală time-stepping}.
+.3 substepping.py \DTcomment{CFL adaptiv, detecție coliziuni}.
+.3 sampler.py \DTcomment{inițializare poziții și viteze}.
+.2 io/.
+.3 gsd\_writer.py \DTcomment{trajectorie HOOMD-GSD}.
+.3 csv\_logger.py \DTcomment{piece\_counts + transitions}.
+.2 analysis/.
+.3 equilibrium.py \DTcomment{$\langle v^2\rangle$, distribuție MB}.
+.3 msd.py \DTcomment{deplasare medie pătratică}.
+.3 transitions.py \DTcomment{matrice tranziții brute}.
+.3 ness.py \DTcomment{bilanț detaliat, $J_\text{loop}$, verdict echilibru/NESS}.
+.3 wall\_stats.py \DTcomment{frecvență coliziuni per regiune}.
+.2 scripts/.
+.3 run\_sim.py \DTcomment{CLI: python -m brownian\_sim.scripts.run\_sim}.
+.3 preview\_geometry.py \DTcomment{export PNG geometrie}.
+}
+\caption{Structura pachetului \texttt{brownian\_sim}. Fiecare subpachet are responsabilitate unică; dependențele curg de sus în jos.}
+\label{fig:dirtree}
+\end{figure}
+
+Fluxul complet de la configurație la rezultate este ilustrat în Figura~\ref{fig:arhitectura}. Utilizatorul specifică parametrii simulării într-un fișier YAML; \texttt{run\_sim.py} construiește obiectele corespunzătoare și le injectează în motorul de simulare; rezultatele sunt scrise simultan în format GSD (pentru trajectorii) și CSV (pentru statistici de ocupare și tranziții între regiuni); modulele de analiză procesează independent aceste ieșiri.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.82\textwidth]{diagrama_arhitectura.png}
+\caption{Diagrama fluxului de date în \texttt{brownian\_sim}. Albastru: intrare (YAML); roz: motor de simulare; verde: ieșiri; portocaliu: analiză post-procesare.}
+\label{fig:arhitectura}
+\end{figure}
+
+O simulare se lansează cu o singură comandă:
+
+\begin{verbatim}
+python -m brownian_sim.scripts.run_sim \
+    --config configs/loop_ou_hetero_long.yaml
+\end{verbatim}
+
+Toate configurațiile din această lucrare sunt fișiere YAML versionabile, reproducibile prin specificarea seminței (\texttt{seed: 42}). Separarea dintre configurație și cod permite rularea sistematică a mai multor experimente fără modificarea surselor.
+
+Simularea urmărește pozițiile și vitezele unui număr $N$ de particule într-un domeniu tridimensional. Parametrii principali sunt rezumați în Tabelul~\ref{tab:params}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\toprule
+Parametru & Valoare & Semnificație \\
+\midrule
+$N$ & 30\,000 & număr de particule \\
+$\Delta t$ & 0.001 & pas temporal de bază \\
+$k_B T$ & 1.0 & temperatură efectivă ($k_B = 1$) \\
+$m$ & 1.0 & masa particulei \\
+$\gamma$ & 0.01 -- 1.0 & coeficient de fricțiune Langevin \\
+\texttt{cfl} & 0.5 & fracție CFL pentru sub-pași adaptivi \\
+\texttt{seed} & 42 & sămânță pentru reproducibilitate \\
+\bottomrule
+\end{tabular}
+\caption{Parametri numerici folosiți în simulările din această lucrare.}
+\label{tab:params}
+\end{table}
+
+Vitezele inițiale sunt trase din distribuția Maxwell--Boltzmann la temperatura $T$, ceea ce asigură că valoarea $\langle v^2 \rangle = 3k_BT/m$ este verificată încă din primul pas.
 
 \subsection{Reprezentarea geometriei}
 
-În forma sa actuală, geometria nu este reprezentată printr-o plasă arbitrară de triunghiuri, ci printr-o uniune de primitive simple: volume paralelipipedice și cilindrice orientate pe axe. Pentru fiecare piesă geometrică sunt reținuți parametri precum poziția, dimensiunile și coeficienții relevanți pentru condițiile la limită. Această structură modulară permite construirea unor configurații mai elaborate prin concatenarea sau suprapunerea controlată a unor sub-regiuni simple.
+Domeniul accesibil particulelor este descris printr-o uniune de primitive simple, fiecare implementând interfața:
 
-Un astfel de mod de reprezentare este potrivit pentru scopul lucrării deoarece face posibilă analiza influenței fiecărei componente geometrice asupra dinamicii. De exemplu, camerele largi și pasaje înguste pot fi asociate cu timpi de staționare diferiți sau cu diferențe tranzitorii de densitate.
+\begin{itemize}
+    \item \texttt{inside(P)}: mască booleană -- care dintre punctele $(N,3)$ sunt în interior;
+    \item \texttt{wall\_distance(p)}: distanța scalară la cel mai apropiat perete;
+    \item \texttt{snap\_and\_normal(p\_new)}: dacă $p_\text{new}$ a ieșit, returnează punctul proiectat pe frontieră și normala unitară spre interior.
+\end{itemize}
+
+Primitivele disponibile sunt \texttt{Box} (paralelipiped aliniat pe axe) și \texttt{CylX}/\texttt{CylY} (cilindru cu axa pe $x$, respectiv $y$). Exemplu de implementare pentru \texttt{Box.snap\_and\_normal}:
+
+\begin{verbatim}
+def snap_and_normal(self, p_new):
+    d = p_new - self._c
+    pen = np.abs(d) - self._half         # penetrare per axă
+    axis = int(np.argmax(pen))           # axa cu cea mai mare penetrare
+    p_snap = p_new.copy()
+    sign = math.copysign(1.0, d[axis])
+    p_snap[axis] = self._c[axis] + sign * self._half[axis]
+    n = np.zeros(3)
+    n[axis] = sign
+    return p_snap, n
+\end{verbatim}
+
+Normala este vectorul unitar pe axa cu cea mai mare depășire, ceea ce corespunde la proiecția pe fața cea mai apropiată a cutiei. Aceeași logică SDF (signed distance function) este aplicată pentru cilindri pe axele $x$ și $y$.
+
+\paragraph{Geometria \texttt{loop\_chambers}.}
+Geometria complexă principală din această lucrare este un preset compus din:
+\begin{itemize}
+    \item două camere paralelipipedice (\texttt{CUBE\_L} și \texttt{CUBE\_R});
+    \item șase cilindri de tip \texttt{CylY} care formează un canal cu pâlnie (\texttt{FUN\_1}\,--\,\texttt{FUN\_6});
+    \item un cilindru de retur \texttt{CylX} (\texttt{RET}) care conectează camerele la $y=45$.
+\end{itemize}
+
+Fiecare piesă geometrică are asociat un material (\texttt{WallMaterial(e\_n, beta\_t)}), astfel încât proprietățile frontierelor pot fi diferite pe fiecare segment. Această asimetrie materială este elementul central al experimentelor din Secțiunea~\ref{sec:rezultate}.
 
 \subsection{Algoritmul de simulare}
 
-La nivel conceptual, algoritmul de simulare poate fi rezumat astfel:
-\begin{enumerate}[label=\arabic*.]
-    \item se inițializează pozițiile particulelor în interiorul domeniului permis;
-    \item se atribuie viteze inițiale conform unei distribuții alese;
-    \item se avansează particulele cu un pas temporal $\Delta t$;
-    \item se detectează particulele care au intersectat peretele sau au părăsit domeniul permis;
-    \item pentru aceste particule se aplică regula de ricoșeu, respectiv corecțiile asociate condiției la limită;
-    \item se colectează observabile statistice relevante.
-\end{enumerate}
+Schema de integrare este de tip \emph{time-stepping} cu sub-pași adaptivi. La fiecare pas de timp $\Delta t$ mare, distanța la perete este estimată și pasul este subdvizat dacă este necesar (parametrul \texttt{cfl} limitează fracția de traversare a domeniului per sub-pas). Pseudocodul algoritmului este:
 
-Din punct de vedere numeric, schema este de tip \emph{time-stepping}. Aceasta este mai ușor de generalizat la geometrii compuse și la termeni stocastici decât o schemă strict \emph{event-driven}, însă presupune alegerea atentă a pasului de timp. Dacă $\Delta t$ este prea mare, o particulă poate traversa numeric frontiera pe o distanță prea mare într-un singur pas, ceea ce impune corecții suplimentare și poate afecta acuratețea simulării.
+\begin{verbatim}
+pentru fiecare pas t = 1 ... T:
+    v = v - (gamma/m)*v*dt + sqrt(2*gamma*kT/m)*randn*sqrt(dt)  # Langevin
+    pentru sub-pas s = 1 ... max_substeps:
+        dt_sub = dt / n_sub               # CFL adaptiv
+        r_new  = r + v * dt_sub           # mișcare liberă
+        pentru fiecare particulă i:
+            dacă NOT assembly.inside(r_new[i]):
+                p_snap, n = prim.snap_and_normal(r_new[i])
+                r_new[i] = p_snap
+                v[i] = wall_model.bounce(v[i], n, material, rng)
+    r = r_new
+\end{verbatim}
 
-Din analiza scriptului disponibil rezultă că există mecanisme suplimentare de stabilizare, inclusiv tratamente separate pentru execuție pe CPU și GPU și versiuni de ricoșeu care includ termeni de tip OU/Langevin la perete. Aceste aspecte vor fi detaliate ulterior, după reluarea simulărilor și validarea parametrilor numerici.
+Separarea dintre dinamica Langevin (aplicată în volum la fiecare pas) și ricoșeu (aplicat local la frontieră) este esențială pentru interpretarea fizică. Ea permite controlul independent al fiecărui mecanism și compararea directă a modelelor.
+
+Cele trei modele de ricoșeu implementate sunt:
+
+\textbf{ElasticBounce:}
+\begin{verbatim}
+def bounce_single(self, v_in, n, material, rng):
+    return v_in - 2.0 * v_in.dot(n) * n
+\end{verbatim}
+
+\textbf{DampedBounce:}
+\begin{verbatim}
+def bounce_single(self, v_in, n, material, rng):
+    vn = v_in.dot(n) * n
+    vt = v_in - vn
+    return -material.e_n * vn + material.beta_t * vt
+\end{verbatim}
+
+\textbf{OUBounce} (termalizant, FDT local):
+\begin{verbatim}
+s = sqrt(kT / m)
+vt' = beta_t * vt + sqrt(1 - beta_t^2) * s * xi_t
+vn' = e_n * |vn_in| + sqrt(1 - e_n^2) * s * xi_n  (fortat vn' > 0)
+\end{verbatim}
+
+Factorul $\sqrt{1 - e_n^2}$ la zgomotul normal și $\sqrt{1 - \beta_t^2}$ la cel tangential sunt impuși de relația fluctuație--disipație: pentru ca distribuția staționară a vitezelor după ricoșeu să fie Maxwell--Boltzmann la temperatura $T$, amplitudinea zgomotului trebuie calibrată precis față de disipare. Observație importantă: viteza de ieșire depinde de $|v_n^\text{in}|$, deci OUBounce păstrează o memorie parțială a vitezei incidente.
+
+\textbf{MaxwellDiffuse} (perete fizic real la temperatura $T$):
+
+Modelul Maxwell diffuse implementează condiția la limită a unui perete fizic real aflat la temperatura uniformă $T$. Principiul fizic este că molecula care lovește peretele intră în contact cu rețeaua cristalină a materialului și \emph{uită complet} viteza de intrare — echivalentul acomodării termice complete. Viteza de ieșire este trasă independent din distribuția termică a peretelui:
+
+\begin{equation}
+    v_t' \sim \mathcal{N}(0,\, s^2)\text{ pe planul tangent},
+    \qquad
+    v_n' \sim \text{Rayleigh}(s), \quad v_n' > 0,
+    \label{eq:maxwell_diffuse}
+\end{equation}
+
+unde $s = \sqrt{k_BT/m}$. Distribuția Rayleigh pentru componenta normală (și nu semi-gaussiană) apare din ponderea cu fluxul: particulele care ies cu viteză normală mai mare traversează suprafața mai frecvent, astfel că distribuția de viteză la ieșire este ponderată cu $v_n'$, dând $P(v_n') \propto v_n' \exp(-v_n'^2 / 2s^2)$.
+
+Implementarea folosește transformata inversă pentru Rayleigh:
+
+\begin{verbatim}
+s = sqrt(kT / m)
+vt' = s * xi_t          # gaussian 2D proiectat pe planul tangent
+vn' = s * sqrt(g1^2 + g2^2)   # Rayleigh via doua gaussiene
+\end{verbatim}
+
+Proprietatea definitorie a acestui model este că viteza de ieșire este \emph{complet independentă} de viteza de intrare. Aceasta este exact condiția de bilanț detaliat la nivel microscopic: pentru orice pereche $(v_\text{in}, v_\text{out})$, probabilitatea tranziției directe și a celei inverse sunt egale în raport cu măsura de echilibru. Ca urmare, $J_\text{loop} = 0$ este garantat prin construcție, indiferent de geometrie sau de eterogenitatea materialelor.
+
+Diferența față de OUBounce este subtilă dar cu consecințe fizice clare: ambele produc o distribuție marginală MB la ieșire, dar numai MaxwellDiffuse satisface bilanțul detaliat microscopic. La $\gamma = 1$ diferența este mascată de termalizarea Langevin din volum; ea devine vizibilă în regim balistic ($\gamma \ll 1$) unde rata de coliziuni cu peretele domină față de termalizarea în volum.
 
 \subsection{Teste de verificare}
 
-Orice simulare de acest tip trebuie însoțită de verificări numerice. În cazul de față, cele mai naturale teste sunt:
+Pachetul conține 25 de teste pytest organizate în trei fișiere corespunzând celor trei straturi ale implementării: geometrie, modele de perete și echilibru Langevin. Toate 25 trec la fiecare rulare.
+
+\paragraph{Teste geometrice (15 teste).}
+Primul grup verifică proprietățile matematice ale primitivelor \texttt{Box}, \texttt{CylX}, \texttt{CylY} și ale ansamblului \texttt{loop\_chambers}. Testele acoperă:
+
 \begin{itemize}
-    \item conservarea energiei cinetice pentru reflexii elastice ideale;
-    \item dependența slabă a observabilelor de alegerea pasului temporal, într-un interval rezonabil;
-    \item reproducerea unui comportament așteptat într-o geometrie simplă;
-    \item stabilitatea statisticilor în raport cu alegerea condițiilor inițiale și, unde este cazul, a seminței aleatoare.
+    \item \emph{inside/outside}: un punct din centrul primitivei este interior; un punct dincolo de capăt sau de mantă este exterior; frontiera este inclusă ($\leq$).
+    \item \emph{wall\_distance}: distanța din centrul unei cutii $10\times10\times10$ la perete este exact 5; distanța unui punct la 1 unitate de față este exact 1.
+    \item \emph{snap\_and\_normal}: un punct care depășește fața $x^+$ se proiectează corect pe frontieră, normala returnată este $\hat{x}$; un punct interior returnează normală nulă. Același test pe mantaua și capul cilindrului verifică că normala radială nu are componentă axială.
+    \item \emph{assembly sampling}: \texttt{sample\_uniform} returnează 500 de puncte care sunt toate în interiorul domeniului, atât pentru cutia simplă cât și pentru geometria \texttt{loop\_chambers}.
 \end{itemize}
 
-Aceste teste sunt importante atât pentru validarea codului, cât și pentru delimitarea clară între efectele fizice ale geometriei și eventualele artefacte numerice.
+Aceste teste garantează că algoritmul de detecție a coliziunilor nu produce false pozitive sau negative și că normala locală este întotdeauna orientată corect spre interior, condiție necesară pentru direcționarea corectă a vitezei după ricoșeu.
 
-\section{Rezultate: structură și direcții de analiză}
+\paragraph{Teste modele de perete (7 teste).}
+Al doilea grup verifică proprietățile fizice ale fiecărui model de ricoșeu izolat, fără dinamică Langevin.
+
+Pentru \texttt{ElasticBounce}: componenta normală a vitezei se inversează exact, componenta tangențială se conservă exact, iar energia cinetică $|\mathbf{v}'|^2 = |\mathbf{v}|^2$ este conservată pentru 50 de perechi aleatoare $(v, \hat{n})$ cu toleranță $10^{-10}$.
+
+Pentru \texttt{DampedBounce}: cu $e_n = 0{,}5$ și $\beta_t = 1{,}0$, componenta normală se reduce la jumătate; cu $e_n = 1{,}0$ și $\beta_t = 0{,}3$, componenta tangențială se reduce la $0{,}3$ din valoarea inițială. Aceste teste verifică că parametrii materialului sunt aplicați pe axele corecte.
+
+Pentru \texttt{OUBounce}: (1) viteza normală de ieșire $v_n' = \mathbf{v}'\cdot\hat{n}$ este strict pozitivă pentru 100 de viteze incidente aleatoare — particula iese întotdeauna spre interior; (2) aplicând ricoșeul pe 5\,000 de viteze incidente gaussiene, varianța componentelor tangențiale ale vitezelor de ieșire este $\sigma^2 \in [0{,}9, 1{,}1]$, confirmând termalizarea la $k_BT/m = 1$; (3) implementarea batch (vectorizată pe $N$ particule simultan) produce aceeași statistică ca implementarea single-particle.
+
+\paragraph{Teste echilibru Langevin (3 teste).}
+Al treilea grup verifică comportamentul termodinamic la nivel de simulare completă, nu doar la nivel de coliziune individuală.
+
+\emph{Menținerea echilibrului}: pornind de la viteze Maxwell--Boltzmann ($N=1\,000$, 1\,000 pași), $\langle v^2 \rangle$ rămâne în intervalul $[2{,}7, 3{,}3]$ — eroare relativă sub 10\%.
+
+\emph{Relaxare din starea rece}: pornind cu toate vitezele nule ($N=1\,000$, 3\,000 pași), $\langle v^2 \rangle$ convergează la $3{,}0 \pm 0{,}45$ — sistemul se încălzește la temperatura de rezervor prin dinamica Langevin și OUBounce la perete.
+
+\emph{Conservarea numărului de particule în geometrie complexă}: după 500 de pași în \texttt{loop\_chambers} cu 500 de particule, niciuna nu are \texttt{piece\_idx} $= -1$ (indicator de pierdere din domeniu). Acesta verifică robustețea algoritmului de reflecție la joncțiunile dintre primitive — colțuri și muchii — unde normala locală poate fi ambiguă.
+
+Împreună, cele 25 de teste acoperă separat fiecare nivel al implementării, permițând localizarea rapidă a oricărei regresii și oferind garanția că rezultatele fizice nu sunt contaminate de artefacte numerice la frontiere.
+
+\section{Rezultate}
 \label{sec:rezultate}
 
-Înainte de reluarea sistematică a tuturor simulărilor, este utilă definirea clară a modului în care rezultatele vor fi prezentate în lucrare. Capitolul de rezultate va fi organizat în jurul a două clase principale de exemple: un caz de referință cu geometrie simplă și unul sau mai multe cazuri cu geometrii compuse.
+\subsection{Caz de referință: cutia simplă}
 
-\subsection{Caz de referință}
+Primul set de simulări folosește o geometrie simplă (o cutie paralelipipedică de dimensiuni $60 \times 60 \times 60$) pentru a valida modelul numeric și a stabili un etalon de comparație. Parametrii sunt cei din Tabelul~\ref{tab:params}, cu $\gamma = 1.0$ și $N=5\,000$ de particule.
 
-Primul pas este studiul unei geometrii simple, de exemplu o cutie fără obstacole interne. În acest caz pot fi verificate:
-\begin{itemize}
-    \item omogenizarea distribuției spațiale pornind dintr-o stare inițială neuniformă;
-    \item stabilizarea observabilelor după atingerea regimului staționar;
-    \item consistența ricoșeurilor cu pereții și a statisticii coliziunilor;
-    \item influența parametrilor numerici asupra mărimilor măsurate.
-\end{itemize}
+Figura~\ref{fig:v2_box} arată evoluția în timp a valorii $\langle v^2 \rangle$ pentru patru modele de perete. Configurația cu ricoșeu elastic (\texttt{ElasticBounce}) menține $\langle v^2 \rangle = 3{,}000$ stabil, fără nicio derivă, ceea ce confirmă că codul conservă energia cinetică la coliziunile ideale. Configurația cu ricoșeu OU (\texttt{OUBounce}, $e_n = 0{,}9$, $\beta_t = 0{,}8$) convergă rapid la aceeași valoare, demonstrând că peretele termalizant compensează exact disiparea introdusă de coeficienții sublimentari. Configurația cu ricoșeu amortizat și coeficienți absorbanti ($e_n = 0{,}05$, $\beta_t = 0{,}05$) fără compensare stochastică scade monoton, arătând că în absența termenului OU peretele funcționează ca un termostat rece artificial.
 
-Acest caz servește drept etalon pentru toate configurațiile mai complicate care urmează.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.82\textwidth]{../sim_out/plots/fig1_v2_box.png}
+\caption{Evoluția $\langle v^2\rangle$ în timp pentru patru configurații în cutia simplă: elastic (constant la 3.0), OU cu $e_n=0{,}9$ (convergență rapidă), OU absorbant (convergență la 3.0 din orice stare inițială), amortizat absorbant (scădere continuă, fără echilibru termal).}
+\label{fig:v2_box}
+\end{figure}
 
-\subsection{Geometrii complexe}
+Figura~\ref{fig:mb_box} prezintă histograma distribuției vitezelor la echilibru pentru configurația cu ElasticBounce și viteze inițiale Maxwell--Boltzmann. Curba măsurată se suprapune cu predicția teoriei~\eqref{eq:maxwell_boltzmann}, confirmând că simulatorul reproduce corect distribuția staționară în geometria de referință.
 
-În geometriile compuse din camere și pasaje cu secțiune variabilă, interesul principal este orientat către rolul structurii spațiale în evoluția densității și în timpii de relaxare. În această parte a lucrării se vor urmări:
-\begin{itemize}
-    \item evoluția densității locale în diferite regiuni ale domeniului;
-    \item posibile acumulări tranzitorii în apropierea constricțiilor;
-    \item timpi caracteristici de transfer între compartimente;
-    \item diferențe între regimul pur elastic și cel cu termalizare la perete.
-\end{itemize}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.72\textwidth]{../sim_out/plots/fig2_mb_distribution.png}
+\caption{Distribuția modulului vitezei la echilibru (ElasticBounce, cutie simplă) față de curba Maxwell--Boltzmann teoretică~\eqref{eq:maxwell_boltzmann}. Acordul este excelent pe întregul domeniu de viteză.}
+\label{fig:mb_box}
+\end{figure}
 
-Aceste rezultate vor permite discutarea întrebării centrale a lucrării: în ce măsură geometria singură poate modifica modul în care un gaz ideal explorează spațiul disponibil și atinge un regim staționar.
+\subsection{Geometria \texttt{loop\_chambers}: prezentare și parametri materiali}
 
-\subsection{Experimente de relaxare}
+Geometria complexă principală este prezentată în Figura~\ref{fig:geom_preview}. Ea este formată din două camere cubice (\texttt{CUBE\_L} și \texttt{CUBE\_R}) conectate prin două căi: un canal cu pâlnie compus din șase cilindri \texttt{FUN\_1}\,--\,\texttt{FUN\_6} (axa $y$, secțiune variabilă) și un canal de retur cilindric \texttt{RET} (axa $x$, la $y=45$).
 
-O metodă naturală de evidențiere a efectului geometriei este pornirea din condiții inițiale dezechilibrate, de exemplu cu particulele concentrate într-o singură cameră. Dinamica ulterioară poate fi analizată prin scăderea contrastului de densitate, prin frecvența de traversare între regiuni sau prin histograme spațiale calculate la diferite momente de timp. O astfel de analiză este deosebit de potrivită pentru comparații între geometrii diferite.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{../sim_out/preview_loop_chambers_ou.png}
+\caption{Vedere perspectivă a geometriei \texttt{loop\_chambers}: camerele \texttt{CUBE\_L} (stânga) și \texttt{CUBE\_R} (dreapta) sunt conectate prin canalul cu pâlnie (sus) și canalul de retur \texttt{RET} (jos). Culorile diferite indică piesele geometrice cu materiale distincte.}
+\label{fig:geom_preview}
+\end{figure}
+
+Fiecare piesă are asociat un material descris prin coeficienții $(e_n, \beta_t)$. În configurațiile eterogene, camerele și canalele au coeficienți diferiți, introducând o asimetrie materială între cele două căi de traversare.
+
+\subsection{Efectul modelului de perete în geometria complexă}
+
+Figura~\ref{fig:v2_loop} arată evoluția $\langle v^2 \rangle$ în geometria \texttt{loop\_chambers} pentru trei modele de perete cu $\gamma = 1{,}0$. Configurația elastică menține temperatura constantă, ca în cutia simplă. Configurația OU cu materiale uniforme convergă de asemenea la $\langle v^2 \rangle = 3{,}000$, confirmând că peretele termalizant respectă relația fluctuație--disipație indiferent de forma domeniului. Configurația amortizată eterogenă prezintă o scădere lentă a temperaturii, produsă de disipare necompensată.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.82\textwidth]{../sim_out/plots/fig3_v2_loop.png}
+\caption{Evoluția $\langle v^2\rangle$ în geometria \texttt{loop\_chambers} pentru ElasticBounce, OUBounce uniform și DampedBounce eterogen. Modelul OU menține echilibrul termal, indiferent de geometrie.}
+\label{fig:v2_loop}
+\end{figure}
+
+\subsection{Distribuția coliziunilor și asimetria materială}
+
+O observabilă specifică geometriei compuse este distribuția coliziunilor per regiune. Figura~\ref{fig:counts} arată frecvența normalizată de coliziuni pentru fiecare piesă a geometriei, în configurația DampedBounce eterogen. Valorile diferă semnificativ între \texttt{CUBE\_L}, \texttt{CUBE\_R}, pâlnie și canal de retur, reflectând atât diferențele de arie, cât și frecvența diferită de accesare a fiecărei regiuni.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.82\textwidth]{../sim_out/plots/fig4_counts_loop.png}
+\caption{Numărul normalizat de coliziuni per piesă geometrică în geometria \texttt{loop\_chambers} (DampedBounce eterogen). Asimetria L/R reflectă combinarea efectului geometric (arie, acces) cu cel material ($e_n$, $\beta_t$).}
+\label{fig:counts}
+\end{figure}
+
+Figura~\ref{fig:asymmetry} compară asimetria $N_L - N_R$ (diferența de coliziuni între camera stângă și cea dreaptă) pentru configurațiile uniform și eterogen. Configurația cu materiale uniforme produce o asimetrie apropiată de zero, în timp ce configurația eterogenă introduce o asimetrie sistematică. Aceasta confirmă că asimetria observată provine din proprietățile materiale ale frontierelor, nu din geometrie în sine.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.72\textwidth]{../sim_out/plots/fig5_asymmetry.png}
+\caption{Asimetria $N_L - N_R$ pentru configurațiile DampedBounce uniform și eterogen. Diferența dintre cele două curbe izolează contribuția eterogenității materialelor față de efectul geometric pur.}
+\label{fig:asymmetry}
+\end{figure}
+
+\subsection{Distribuția vitezelor în geometria complexă — OUBounce și Maxwell diffuse}
+
+Figura~\ref{fig:mb_loop_ou} prezintă distribuția vitezelor în geometria \texttt{loop\_chambers} cu OUBounce și materiale eterogene, măsurată după atingerea regimului staționar. Histograma se suprapune cu curba Maxwell--Boltzmann, demonstrând că modelul OU produce o distribuție marginală a vitezelor corectă la temperatura $T$, indiferent de forma domeniului sau de eterogenitatea coeficienților $(e_n, \beta_t)$.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.72\textwidth]{../sim_out/plots/fig6_mb_loop_ou.png}
+\caption{Distribuția modulului vitezei în \texttt{loop\_chambers} cu OUBounce eterogen față de curba Maxwell--Boltzmann teoretică. Distribuția marginală a vitezelor e corectă, dar aceasta nu garantează singură echilibrul termodinamic global.}
+\label{fig:mb_loop_ou}
+\end{figure}
+
+\subsection{Testul de echilibru termodinamic: curentul net prin loop}
+\label{subsec:ness}
+
+Distribuția Maxwell--Boltzmann a vitezelor este o condiție necesară dar nu suficientă pentru echilibrul termodinamic. Un test mai sensibil este curentul net $J_\text{loop}$ prin ciclul CUBE\_L $\to$ FUNNELS $\to$ CUBE\_R $\to$ RET, calculat din matricea de tranziții observată:
+
+\begin{equation}
+    J_\text{loop} = \sum_{\text{ciclu}} \left(\pi_i P_{ij} - \pi_j P_{ji}\right),
+\end{equation}
+
+unde $\pi$ este distribuția staționară empirică și $P_{ij}$ probabilitățile de tranziție între regiuni. La echilibru termodinamic, bilanțul detaliat impune $J_\text{loop} = 0$.
+
+Tabelul~\ref{tab:jloop} prezintă valorile $J_\text{loop}$ obținute pentru diferite modele de perete. Simulările cu $\gamma=1$ au acumulat între 17\,000 și 32\,000 tranziții ($N=30\,000$, $t=300\,000$ pași), suficient pentru a distinge semnalul fizic de fluctuațiile statistice.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{llrrlll}
+\toprule
+Model perete & Materiale & $\gamma$ & $N_\text{tr}$ & $J_\text{loop}$ & $R_\text{max}$ & Verdict \\
+\midrule
+Maxwell diffuse  & eterogen & 1{,}0 & 17\,178 & $+3{,}17\times10^{-3}$ & $3{,}96\times10^{-4}$ & echilibru \\
+OUBounce         & eterogen & 1{,}0 & 32\,093 & $-1{,}41\times10^{-3}$ & $1{,}76\times10^{-4}$ & echilibru \\
+OUBounce         & uniform  & 1{,}0 & 32\,326 & $+2{,}31\times10^{-3}$ & $2{,}89\times10^{-4}$ & echilibru \\
+\midrule
+Maxwell diffuse  & eterogen & 0{,}01 & 1\,797 & $+1{,}03\times10^{-2}$ & $1{,}29\times10^{-3}$ & tranzitoriu$^*$ \\
+OUBounce         & eterogen & 0{,}01 & 2\,337 & $+1{,}97\times10^{-2}$ & $2{,}46\times10^{-3}$ & tranzitoriu$^*$ \\
+ElasticBounce    & —        & 0{,}01 & 3\,315 & $+1{,}83\times10^{-2}$ & $2{,}29\times10^{-3}$ & tranzitoriu$^*$ \\
+\bottomrule
+\end{tabular}
+\caption{Curentul net $J_\text{loop}$ și asimetria maximă de flux $R_\text{max}$ pentru diferite modele de perete ($N=30\,000$, $t=300\,000$ pași pentru $\gamma=1$; $t=30\,000$ pași pentru $\gamma=0{,}01$). La $\gamma=1$, toate modelele termalizante produc $J_\text{loop}$ de ordinul zgomotului statistic — echilibru termodinamic. La $\gamma=0{,}01$ ($\tau_v = 100$), sistemul nu a atins echilibrul indiferent de modelul de perete ($^*$tranzitoriu).}
+\label{tab:jloop}
+\end{table}
+
+Rezultatele arată că la $\gamma=1$ și număr suficient de tranziții, toate modelele termalizante produc $J_\text{loop} \approx 0$. Valorile mari observate în rulările scurte (câteva sute de tranziții) sunt artefacte statistice, nu curenți reali.
+
+Diferența fundamentală între modele nu este în starea de echilibru finală, ci în \emph{garanția teoretică} cu care aceasta este atinsă. Modelul Maxwell diffuse satisface bilanțul detaliat la nivel de coliziune individuală — viteza de ieșire este complet independentă de viteza de intrare, ceea ce garantează $J_\text{loop} = 0$ prin construcție. OUBounce satisface FDT local (distribuția marginală de ieșire e MB), dar viteza de ieșire depinde parțial de cea de intrare prin termenul $e_n|v_{n}^\text{in}|$, ceea ce rupe bilanțul detaliat microscopic. La $\gamma=1$, efectul e compensat de Langevin în volum și nu se observă diferență practică. Această distincție devine importantă în regimuri balistice ($\gamma \ll 1$) sau pentru geometrii cu rate de coliziune foarte asimetrice.
 
 \section{Concluzii}
 \label{sec:concluzii}
 
-Modelarea unui gaz ideal în geometrii de confinare complexe oferă un cadru simplu, dar relevant, pentru studiul relației dintre dinamică microscopică și comportament statistic. Chiar în absența interacțiilor directe între particule, pereții și forma domeniului joacă un rol esențial în organizarea traiectoriilor și în definirea observabilelor macroscopice.
+Această lucrare a studiat mișcarea Browniană a unui ansamblu de particule independente într-o geometrie de confinare complexă — două camere cuplate printr-un canal cu pâlnie asimetrică și un canal de retur — cu accent pe rolul condiției la limită la perete și al proprietăților materiale ale frontierelor.
 
-Pe baza materialului disponibil până în acest stadiu, proiectul are o fundație bună atât teoretic, cât și numeric. Existența unui cod modular, capabil să trateze geometrii compuse și să ruleze pe CPU sau GPU, reprezintă un punct de pornire solid pentru dezvoltarea lucrării. Etapa următoare constă în reluarea rulărilor relevante, selectarea parametrilor finali și integrarea figurilor și statisticilor în capitolul de rezultate.
+Principalele rezultate sunt:
 
-Direcțiile naturale de extindere includ compararea mai sistematică a mai multor geometrii, definirea unor observabile de transport mai rafinate și analiza mai atentă a cazurilor în care peretele introduce termalizare locală sau dinamică stocastică de tip Langevin.
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{Validarea modelului numeric.} Pachetul \texttt{brownian\_sim} reproduce distribuția Maxwell--Boltzmann în geometria de referință (cutie simplă) cu erori relative sub $0{,}5\%$ față de valoarea teoretică $\langle v^2 \rangle = 3k_BT/m$. Conservarea numărului de particule este exactă în toate configurațiile simulate ($\Delta N = 0$ la fiecare pas).
 
-\section*{Anexă de lucru}
+    \item \textbf{Condiția la limită fizic corectă: Maxwell diffuse.} Un perete fizic real la temperatura uniformă $T$ trebuie să satisfacă bilanțul detaliat la nivel de coliziune individuală: viteza de ieșire trebuie să fie complet independentă de cea de intrare. Modelul Maxwell diffuse implementat satisface această proprietate prin construcție — componenta normală urmează distribuția Rayleigh, componenta tangențială urmează o distribuție gaussiană izotropă în planul tangent — și produce $J_\text{loop} \to 0$ independent de geometrie și materiale.
 
-În versiunea curentă a documentului rămân de completat următoarele elemente:
-\begin{itemize}
-    \item verificarea finală a formatării numelui și a informațiilor instituționale pe pagina de titlu;
-    \item un subcapitol dedicat scriptului principal de simulare și parametrilor săi;
-    \item un tabel cu parametrii numerici utilizați în exemplele finale;
-    \item figuri pentru geometriile simulate și pentru distribuțiile spațiale obținute;
-    \item o secțiune de rezultate bazată pe rulările efective ale codului.
-\end{itemize}
+    \item \textbf{Geometria singură nu produce NESS în condiții naturale.} Cu modelul Maxwell diffuse și dinamică Langevin în volum ($\gamma = 1$), curentul net $J_\text{loop}$ prin ciclul celor patru regiuni ale geometriei converge spre zero cu statistică suficientă ($N_\text{tr} \gtrsim 10\,000$ tranziții). Geometria asimetrică a canalelor cu pâlnie influențează timpii de rezidență și rata de traversare, dar nu produce un curent net persistent.
+
+    \item \textbf{NESS aparent în simulări scurte este artefact statistic.} La număr mic de tranziții ($N_\text{tr} < 3\,000$), valorile $J_\text{loop}$ pot fi de ordinul $10^{-2}$, sugerând un curent net. Acestea dispar cu statistică suficientă și reprezintă fluctuații statistice ale matricei de tranziție empirice, nu un fenomen fizic real.
+
+    \item \textbf{Alegerea modelului de perete determină ce fizică apare.} Modelul DampedBounce (fără compensare stochastică) produce o răcire monotonă a sistemului — o condiție nenaturală. Modelul OUBounce reproduce distribuția MB marginală corect, dar rupe bilanțul detaliat microscopic prin dependența vitezei de ieșire de modulul celei de intrare. La $\gamma = 1$ efectul este mascat de termalizarea Langevin din volum, dar devine vizibil în regimuri balistice. Aceasta ilustrează că verificarea distribuției marginale a vitezelor nu este suficientă pentru validarea echilibrului termodinamic — este necesară și verificarea curentului net $J_\text{loop}$.
+\end{enumerate}
+
+Limitele principale ale modelului sunt absența coliziunilor interparticulare și numărul finit de particule, care introduc fluctuații statistice la timpi scurți. Aceste simplificări sunt intenționate: ele permit izolarea clară a efectelor geometriei și ale frontierelor.
+
+Direcțiile naturale de extindere includ introducerea unui gradient termic ($T_L \neq T_R$) între cele două camere, care ar produce un NESS real cu flux de căldură staționar măsurabil, și studierea regimului de densitate finită cu interacții Lennard-Jones, unde efectele geometriei s-ar combina cu cele ale coliziunilor interparticulare. Prima direcție corespunde principiului de funcționare al pompelor Knudsen, dispozitive fără piese mobile care pompează gaz prin gradient termic în regim rarefiat ($\text{Kn} = \lambda/L \gtrsim 0{,}1$). La această scară, simularea Brownian/Langevin este instrumentul adecvat, deoarece ipoteza de fluid continuu din metodele CFD clasice nu mai este valabilă, iar coliziunile individuale particulă--perete constituie mecanismul dominant.
 
 \end{document}

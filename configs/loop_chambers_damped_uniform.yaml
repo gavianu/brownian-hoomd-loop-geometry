@@ -1,0 +1,43 @@
+# Loop chambers cu DampedBounce și materiale UNIFORME.
+# Controlul crucial: arată că NESS-ul fals din damped_hetero vine din heterogenitate,
+# nu din modelul damped în sine. Cu materiale uniforme, sistemul se răcește simetric.
+# Predicție: <v^2> scade (răcire), dar ocupanța pe camere rămâne simetrică.
+
+geometry:
+  preset: loop_chambers
+  params:
+    mat_cube_L: {e_n: 0.9, beta_t: 0.8}
+    mat_cube_R: {e_n: 0.9, beta_t: 0.8}
+    mat_funnel:
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+    mat_ret: {e_n: 0.9, beta_t: 0.8}
+
+wall_model: damped
+
+simulation:
+  n_particles: 10000
+  steps: 10000
+  dt: 0.001
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 200
+
+output:
+  dir: sim_out/loop_chambers_damped_uniform
+  gsd: true
+  csv: true
+  gsd_subset: 5000
+  box: [520.0, 320.0, 260.0]

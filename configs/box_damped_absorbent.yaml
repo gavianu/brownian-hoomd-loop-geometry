@@ -1,0 +1,40 @@
+# Box simplu cu pereti DAMPED si material ABSORBANT (e_n~0, beta_t~0).
+# Fara kick termic: particula se intoarce cu 5% din viteza incidenta.
+# Predictie: <v^2> scade rapid catre zero — racire accelerata fata de box_damped
+# (unde e_n=0.95 pastreaza 95% din viteza normala).
+# Compara cu box_ou_absorbent pentru a vedea ca OU mentine echilibrul chiar
+# la e_n=0.05, pe cand Damped il dreneaza complet.
+
+geometry:
+  preset: simple_box
+  params:
+    size: [100.0, 100.0, 100.0]
+    center: [0.0, 0.0, 0.0]
+    material:
+      e_n: 0.05
+      beta_t: 0.05
+
+wall_model: damped
+
+simulation:
+  n_particles: 5000
+  steps: 5000
+  dt: 0.01
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 500
+  log_every: 200
+
+output:
+  dir: sim_out/box_damped_absorbent
+  gsd: true
+  csv: true
+  gsd_subset: 2000
+  box: [120.0, 120.0, 120.0]

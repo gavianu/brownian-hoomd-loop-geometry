@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Tuple
+from typing import ClassVar, Tuple
 
 import numpy as np
 
@@ -23,7 +23,7 @@ class Primitive(ABC):
     """Interfață comună pentru toate primitivele geometrice."""
 
     # identificator numeric pentru reprezentări vectorizate
-    TYPE_ID: int = -1
+    TYPE_ID: ClassVar[int] = -1
 
     @abstractmethod
     def inside(self, P: np.ndarray) -> np.ndarray:
@@ -50,7 +50,7 @@ class Box(Primitive):
 
     center: Tuple[float, float, float]
     size: Tuple[float, float, float]
-    TYPE_ID = 0
+    TYPE_ID: ClassVar[int] = 0
 
     def __post_init__(self) -> None:
         self._c = np.asarray(self.center, dtype=np.float64)
@@ -92,8 +92,8 @@ class _CylinderAxisAligned(Primitive):
     R: float
     L: float
 
-    # axis_idx: 0 pentru X, 1 pentru Y — setat în subclasă
-    AXIS_IDX: int = -1
+    # axis_idx: 0 pentru X, 1 pentru Y — setat în subclasă ca ClassVar
+    AXIS_IDX: ClassVar[int] = -1
 
     def __post_init__(self) -> None:
         self._c = np.array([self.cx, self.cy, self.cz], dtype=np.float64)
@@ -160,12 +160,12 @@ class _CylinderAxisAligned(Primitive):
 @dataclass
 class CylX(_CylinderAxisAligned):
     """Cilindru cu axa paralelă cu OX."""
-    AXIS_IDX = 0
-    TYPE_ID = 1
+    AXIS_IDX: ClassVar[int] = 0
+    TYPE_ID: ClassVar[int] = 1
 
 
 @dataclass
 class CylY(_CylinderAxisAligned):
     """Cilindru cu axa paralelă cu OY."""
-    AXIS_IDX = 1
-    TYPE_ID = 2
+    AXIS_IDX: ClassVar[int] = 1
+    TYPE_ID: ClassVar[int] = 2

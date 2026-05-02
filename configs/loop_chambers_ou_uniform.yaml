@@ -1,0 +1,43 @@
+# Loop chambers cu OU bounce și materiale UNIFORME pe toată geometria.
+# Referință curată: elimină efectul heterogenității materialelor.
+# Predicție: echilibru, conturi per regiune proporționale cu volumul.
+# Compară cu loop_chambers_ou (hetero) pentru a izola efectul materialelor.
+
+geometry:
+  preset: loop_chambers
+  params:
+    mat_cube_L: {e_n: 0.9, beta_t: 0.8}
+    mat_cube_R: {e_n: 0.9, beta_t: 0.8}
+    mat_funnel:
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+    mat_ret: {e_n: 0.9, beta_t: 0.8}
+
+wall_model: ou
+
+simulation:
+  n_particles: 10000
+  steps: 10000
+  dt: 0.001
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 200
+
+output:
+  dir: sim_out/loop_chambers_ou_uniform
+  gsd: true
+  csv: true
+  gsd_subset: 5000
+  box: [520.0, 320.0, 260.0]

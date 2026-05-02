@@ -1,0 +1,43 @@
+# Loop chambers damped UNIFORM cu gamma=0.01 — control pentru ballistic hetero.
+# Aceleasi materiale pe toti peretii, acelasi gamma mic.
+# Predictie: fara asimetrie — orice diferenta fata de hetero_ballistic
+# vine EXCLUSIV din heterogenitatea materialelor, nu din gamma.
+
+geometry:
+  preset: loop_chambers
+  params:
+    mat_cube_L: {e_n: 0.9, beta_t: 0.8}
+    mat_cube_R: {e_n: 0.9, beta_t: 0.8}
+    mat_funnel:
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+      - {e_n: 0.9, beta_t: 0.8}
+    mat_ret: {e_n: 0.9, beta_t: 0.8}
+
+wall_model: damped
+
+simulation:
+  n_particles: 30000
+  steps: 30000
+  dt: 0.001
+  mass: 1.0
+  gamma: 0.01
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 500
+
+output:
+  dir: sim_out/loop_damped_uniform_ballistic
+  gsd: true
+  csv: true
+  gsd_subset: 15000
+  box: [520.0, 320.0, 260.0]

@@ -13,8 +13,10 @@ Proiectul modelează mișcarea Browniană/Langevin a tracerilor într-o geometri
 - Gaz ideal diluat (fără interacțiuni tracer–tracer).
 - Evoluție Langevin în volum (fricțiune + zgomot termic calibrat FDT).
 - Frontiere descrise geometric (Box, CylX, CylY) + material (`e_n`, `beta_t`).
-- Modele de perete implementate și testate: `ElasticBounce`, `DampedBounce`, `OUBounce`.
-- Modelul OU este cel "termalizant corect" — menține distribuția MB la temperatura țintă.
+- Modele de perete implementate și testate: `ElasticBounce`, `DampedBounce`, `OUBounce`, `MaxwellDiffuse`.
+- `MaxwellDiffuse` este modelul fizic corect: v_out complet independent de v_in, satisface bilanțul detaliat microscopic, componenta normală Rayleigh, tangențială gaussiană izotropă.
+- `OUBounce` produce distribuția marginală MB corectă (FDT local), dar rupe bilanțul detaliat prin dependența de `|v_n_in|`. La γ=1 diferența e mascată de Langevin în volum.
+- NESS real = dezechilibru extern (ex. 2 termostate). Geometria singură nu produce NESS cu pereți termalizanți.
 
 ## Ce NU trebuie schimbat fără confirmare
 1. Semantica parametrilor materiali (`e_n ∈ [0,1]`, `beta_t ∈ [0,1]`).
@@ -37,13 +39,25 @@ Proiectul modelează mișcarea Browniană/Langevin a tracerilor într-o geometri
 - „OU la perete e zgomot arbitrar.” (fals — calibrare FDT)
 - „Coeficienții `e_n`/`beta_t` sunt detalii numerice.” (fals — determină regimul fizic)
 
-## Status lucrare
-- `latex/main.tex` are Introducere + Fundamente teoretice complete (secțiunile 2.1–2.8).
-- Rămân de completat: secțiunea Model numeric detaliată, tabel parametri, figuri, Rezultate cu rulări reale, Concluzii cu narațiunea corectă.
-- Deadline: ~2026-05-08 (finalizare), susținere iunie 2026.
+## Status lucrare (Mai 2026)
+`latex/main.tex` — 27 pagini, toate secțiunile prezente:
+- §1 Introducere: completă
+- §2.1–2.5 Fundamente teoretice: complete cu ecuații
+- §3.1–3.4 Model numeric: complet (arhitectură, geometrie, algoritm + pseudocod, teste)
+- §4.1–4.6 Rezultate: complete cu figuri reale și tabel J_loop cu date din simulări
+- §5 Concluzii: complete, 5 concluzii numerotate
 
-## Validare refactor vs legacy
-- `<v²>` refactor = 3.016 la echilibru (țintă 3.000) ✓
+Simulări disponibile în `sim_out/`:
+- `loop_maxwell_hetero_long`: 300k pași, γ=1, MaxwellDiffuse, în curs (~220k/300k pași)
+- `loop_ou_hetero_long`: 300k pași, γ=1, OUBounce eterogen, FINALIZAT (32k tranziții)
+- `loop_ou_uniform_long`: 300k pași, γ=1, OUBounce uniform, FINALIZAT (32k tranziții)
+- `loop_maxwell_ballistic`, `loop_ou_hetero_ballistic`, `loop_elastic_ballistic`: γ=0.01, regim tranzitoriu
+
+## RESTRICȚIE LaTeX — IMPORTANT
+Schimbările de fraze întregi sau paragrafe în `latex/main.tex` necesită confirmare explicită din partea utilizatorului înainte de execuție. Modificările de date numerice (tabele, valori), referințe și structuri tehnice minore sunt permise fără confirmare.
+
+## Validare cod
+- `<v²>` = 3.016 la echilibru (țintă 3.000) ✓
+- 25/25 teste pytest trec ✓
 - Niciun OUT în loop_chambers ✓
-- Speedup ~62× vs legacy CPU
-- 25/25 teste trec
+- `brownian_sim/analysis/ness.py` integrat în pachet (funcții: load_counts, detailed_balance_metrics, loop_current, ness_verdict)

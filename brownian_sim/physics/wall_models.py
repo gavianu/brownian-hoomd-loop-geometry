@@ -182,6 +182,64 @@ class OUBounce(WallModel):
         return vt_p + vn_p[:, None] * n
 
 
+# ---------------- MaxwellDiffuse ----------------
+
+class MaxwellDiffuse(WallModel):
+    """Reflexie difuza Maxwell — perete fizic real la temperatura T uniforma.
+
+    Particula 'uita' complet viteza de intrare:
+      v_t' ~ Gaussian 2D izotrop in planul tangent, sigma = sqrt(kT/m)
+      v_n' ~ Rayleigh(sigma),  P(v) propto v * exp(-v^2 / 2*sigma^2), v > 0
+
+    Distributia Rayleigh (nu semi-Gaussian) apare din ponderea cu fluxul:
+    particulele care ies mai repede strabat suprafata mai des, deci distributia
+    de viteze la iesire e ponderata cu v_n => Rayleigh, nu semi-Gaussian.
+
+    Aceasta e singura distributie care satisface balanta detaliata la nivel
+    de coliziune individuala => J_loop = 0 la echilibru, indiferent de
+    geometrie sau de heterogenitatea materialelor. Modelul de referinta
+    pentru 'perete fizic real la T ambient'.
+    """
+
+    def __init__(self, kT_over_m: float) -> None:
+        self.kT_over_m = float(kT_over_m)
+        self.s = math.sqrt(self.kT_over_m)
+
+    def needs_temperature(self) -> bool:
+        return True
+
+    def bounce_single(self, v_in, n, material, rng):
+        import numpy as np
+        s = self.s
+        # tangent: 2 componente gaussiene proiectate pe planul tangent
+        xi3 = rng.standard_normal(3)
+        xi_t = xi3 - float(xi3.dot(n)) * n
+        vt_p = s * xi_t
+
+        # normal: Rayleigh via transform: v = s * sqrt(-2 * log(U)), U ~ Uniform(0,1)
+        # echivalent cu sqrt al sumei a 2 gaussiene patrate (chi cu 2 grade)
+        u = rng.random()
+        vn_p = s * math.sqrt(-2.0 * math.log(max(u, 1e-300)))
+
+        return vt_p + vn_p * n
+
+    def bounce_batch(self, v_in, n, e_n, beta_t, xp, rng=None):
+        M = v_in.shape[0]
+        s = float(self.s)
+
+        # tangent gaussian proiectat
+        xi3 = _standard_normal(xp, v_in.shape, v_in.dtype, rng)
+        xi_t = xi3 - xp.sum(xi3 * n, axis=1, keepdims=True) * n
+        vt_p = s * xi_t
+
+        # normal Rayleigh: sqrt(g1^2 + g2^2) * s
+        g1 = _standard_normal(xp, (M,), v_in.dtype, rng)
+        g2 = _standard_normal(xp, (M,), v_in.dtype, rng)
+        vn_p = s * xp.sqrt(g1**2 + g2**2)
+
+        return vt_p + vn_p[:, None] * n
+
+
 def _standard_normal(xp, shape, dtype, rng):
     """Helper: gaussian standard cross-backend, cu RNG opțional (numpy)."""
     if rng is not None and hasattr(rng, "standard_normal"):
@@ -203,4 +261,8 @@ def make_wall_model(name: str, kT_over_m: float | None = None) -> WallModel:
         if kT_over_m is None:
             raise ValueError("OUBounce necesită kT_over_m")
         return OUBounce(kT_over_m)
-    raise ValueError(f"wall_model necunoscut: {name}. Opțiuni: elastic, damped, ou.")
+    if name == "maxwell":
+        if kT_over_m is None:
+            raise ValueError("MaxwellDiffuse necesită kT_over_m")
+        return MaxwellDiffuse(kT_over_m)
+    raise ValueError(f"wall_model necunoscut: {name}. Opțiuni: elastic, damped, ou, maxwell.")

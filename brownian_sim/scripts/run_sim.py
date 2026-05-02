@@ -28,7 +28,25 @@ def _build_assembly(geom_cfg: dict):
 
     if preset == "loop_chambers":
         from brownian_sim.geometry.presets.loop_chambers import LoopChambersParams, build
-        return build(LoopChambersParams(**params)) if params else build()
+        if not params:
+            return build()
+        from brownian_sim.materials.wall_material import WallMaterial
+
+        def _mat(v):
+            return WallMaterial(**v) if isinstance(v, dict) else v
+
+        def _mat_tuple(v):
+            return tuple(_mat(x) for x in v) if isinstance(v, list) else v
+
+        parsed = {}
+        for k, v in params.items():
+            if k in ("mat_cube_L", "mat_cube_R", "mat_ret"):
+                parsed[k] = _mat(v)
+            elif k == "mat_funnel":
+                parsed[k] = _mat_tuple(v)
+            else:
+                parsed[k] = tuple(v) if isinstance(v, list) else v
+        return build(LoopChambersParams(**parsed))
 
     raise ValueError(f"preset necunoscut: {preset}. Opțiuni: simple_box, loop_chambers")
 

@@ -1,0 +1,32 @@
+# Loop chambers cu pereți elastici ideali.
+# Materiale ignorate de ElasticBounce — toți pereții se comportă identic.
+# Predicție: echilibru, matrice tranziții aproape simetrică.
+# Compară cu loop_chambers_ou pentru a verifica că geometria singură nu produce NESS.
+
+geometry:
+  preset: loop_chambers
+
+wall_model: elastic
+
+simulation:
+  n_particles: 10000
+  steps: 10000
+  dt: 0.001
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 200
+
+output:
+  dir: sim_out/loop_chambers_elastic
+  gsd: true
+  csv: true
+  gsd_subset: 5000
+  box: [520.0, 320.0, 260.0]

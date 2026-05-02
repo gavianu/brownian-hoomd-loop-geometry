@@ -1,0 +1,42 @@
+# Loop chambers Maxwell diffuse hetero — rulare scurta pentru verificare rapida NESS.
+# Identic cu loop_maxwell_hetero_long dar steps=30k.
+# Scop: verifica rapid ca J_loop ~ 0 inainte de a astepta 300k steps.
+
+geometry:
+  preset: loop_chambers
+  params:
+    mat_cube_L: {e_n: 0.9, beta_t: 0.7}
+    mat_cube_R: {e_n: 0.3, beta_t: 0.55}
+    mat_funnel:
+      - {e_n: 0.85, beta_t: 0.85}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+    mat_ret: {e_n: 0.98, beta_t: 0.02}
+
+wall_model: maxwell
+
+simulation:
+  n_particles: 30000
+  steps: 30000
+  dt: 0.001
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 500
+
+output:
+  dir: sim_out/loop_maxwell_hetero_short
+  gsd: true
+  csv: true
+  gsd_subset: 15000
+  box: [520.0, 320.0, 260.0]

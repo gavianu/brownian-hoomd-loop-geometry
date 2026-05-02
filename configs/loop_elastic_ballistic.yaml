@@ -1,0 +1,32 @@
+# Loop chambers elastic cu gamma=0.01 — referinta balistica pura.
+# Fara disipare la perete, fara OU. Energia cinetica se conserva la coliziuni.
+# Predictie: distributie MB initiala se pastreaza, fara drift, simetrie perfecta.
+# Referinta de baza pentru regimul balistic.
+
+geometry:
+  preset: loop_chambers
+
+wall_model: elastic
+
+simulation:
+  n_particles: 30000
+  steps: 30000
+  dt: 0.001
+  mass: 1.0
+  gamma: 0.01
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 1000
+  log_every: 500
+
+output:
+  dir: sim_out/loop_elastic_ballistic
+  gsd: true
+  csv: true
+  gsd_subset: 15000
+  box: [520.0, 320.0, 260.0]

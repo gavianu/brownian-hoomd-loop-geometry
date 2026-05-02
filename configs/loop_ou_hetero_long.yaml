@@ -1,0 +1,43 @@
+# Loop chambers OU hetero — rulare lunga pentru convergenta J_loop.
+# Identic cu loop_chambers_ou (hetero default) dar steps=300k.
+# Scop: confirmare ca J_loop Knudsen e stabil si nu e tranzitoriu.
+# Output dir separat: sim_out/loop_ou_hetero_long — nu suprascrie nimic.
+
+geometry:
+  preset: loop_chambers
+  params:
+    mat_cube_L: {e_n: 0.9, beta_t: 0.7}
+    mat_cube_R: {e_n: 0.3, beta_t: 0.55}
+    mat_funnel:
+      - {e_n: 0.85, beta_t: 0.85}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+      - {e_n: 0.98, beta_t: 0.30}
+    mat_ret: {e_n: 0.98, beta_t: 0.02}
+
+wall_model: ou
+
+simulation:
+  n_particles: 30000
+  steps: 300000
+  dt: 0.001
+  mass: 1.0
+  gamma: 1.0
+  kT: 1.0
+  seed: 42
+  velocity_init: maxwell_boltzmann
+  cfl: 0.5
+  max_substeps: 32
+  adapt_every: 1
+  track_k: 200
+  write_every: 10000
+  log_every: 1000
+
+output:
+  dir: sim_out/loop_ou_hetero_long
+  gsd: true
+  csv: true
+  gsd_subset: 15000
+  box: [520.0, 320.0, 260.0]

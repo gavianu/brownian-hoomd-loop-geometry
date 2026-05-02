@@ -1,0 +1,31 @@
+flowchart TD
+    YAML["configs/*.yaml\n(parametri simulare)"]
+    CLI["scripts/run_sim.py\n(CLI entry point)"]
+    GEO["geometry/\nprimitive + assembly + presets"]
+    MAT["materials/\nWallMaterial(e_n, beta_t)"]
+    WALL["physics/wall_models.py\nElastic / Damped / OU / Maxwell"]
+    DYN["physics/dynamics.py\nLangevinIntegrator"]
+    ENG["simulation/engine.py\ntime-stepping principal"]
+    SUB["simulation/substepping.py\nCFL adaptiv"]
+    IO["io/\nGSDWriter + CSVLoggers"]
+    OUT["sim_out/\nrun.gsd\npiece_counts.csv\ntransitions.csv"]
+    AN["analysis/\nequilibrium / msd\ntransitions / wall_stats"]
+
+    YAML --> CLI
+    CLI --> GEO
+    CLI --> MAT
+    CLI --> WALL
+    CLI --> ENG
+    GEO --> ENG
+    MAT --> WALL
+    WALL --> ENG
+    DYN --> ENG
+    ENG --> SUB
+    ENG --> IO
+    IO --> OUT
+    OUT --> AN
+
+    style YAML fill:#e8f4f8,stroke:#2196F3
+    style OUT fill:#e8f5e9,stroke:#4CAF50
+    style AN fill:#fff3e0,stroke:#FF9800
+    style ENG fill:#fce4ec,stroke:#E91E63
