@@ -173,9 +173,28 @@ for dev_id, label in [(-1, "CPU")]:  # GPU adaugat automat mai jos
     out(f"  {label}: {ms_sim:.1f} ms/pas  (300k pasi ~ {est_h:.1f} ore)")
 
 if HAS_GPU:
-    out(f"  GPU: N/A -- geometria SDF (inside_any/locate) ramane pe CPU.")
-    out(f"  Transferurile PCIe per sub-pas anuleaza castigul GPU pe fizica.")
-    out(f"  Extensia full-GPU necesita portarea geometriei SDF pe CuPy.")
+    # masuram overhead real PCIe: 4 transferuri CPU<->GPU per sub-pas
+    # (inside_any, locate, bounce input, bounce output)
+    import cupy as cp
+    N_sim = 30_000
+    arr = cp.random.rand(N_sim, 3).astype(cp.float32)
+    for _ in range(5):
+        _ = cp.asnumpy(arr); _ = cp.asarray(cp.asnumpy(arr))
+    cp.cuda.stream.get_current_stream().synchronize()
+    t0 = time.perf_counter()
+    for _ in range(BENCH_STEPS):
+        a = cp.asnumpy(arr)   # GPU->CPU (inside_any + locate)
+        _ = cp.asarray(a)     # CPU->GPU (p_new actualizat)
+        b = cp.asnumpy(arr)   # GPU->CPU (viteze pentru bounce)
+        _ = cp.asarray(b)     # CPU->GPU (viteze dupa bounce)
+    cp.cuda.stream.get_current_stream().synchronize()
+    ms_pcie = (time.perf_counter() - t0) / BENCH_STEPS * 1000
+    ms_gpu_hybrid = ms_sim + ms_pcie
+    out(f"  GPU hibrid (kernele GPU + geometrie CPU):")
+    out(f"    overhead PCIe per pas:  {ms_pcie:.1f} ms")
+    out(f"    total estimat:          {ms_gpu_hybrid:.1f} ms/pas  "
+        f"(300k pasi ~ {ms_gpu_hybrid*300000/3600000:.1f} ore)")
+    out(f"    speedup vs CPU pur:     {ms_sim/ms_gpu_hybrid:.2f}x  <- mai RАU")
 
 # -- Sumar -------------------------------------------------------
 out()
