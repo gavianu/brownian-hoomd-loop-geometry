@@ -264,7 +264,7 @@ Un caz limită important al modelului termalizant este condiția la limită Maxw
     \label{eq:maxwell_diffuse_n}
 \end{equation}
 
-Distribuția Rayleigh pentru componenta normală — și nu semi-gaussiană — apare din ponderea cu fluxul de particule: o particulă cu viteză normală $v_n'$ mai mare traversează suprafața mai des, deci probabilitatea de emisie este proporțională cu $v_n' \exp(-v_n'^2/2\sigma^2)$, ceea ce dă exact distribuția Rayleigh. Această proprietate garantează bilanțul detaliat la nivel de coliziune individuală: rata de tranziție $\mathbf{v} \to \mathbf{v}'$ este egală cu rata inversă $\mathbf{v}' \to \mathbf{v}$, o condiție mai puternică decât simpla termalizare marginală. Consecința directă este că un sistem cu pereți Maxwell diffuse la aceeași temperatură $T$ satisface $J_\text{loop} = 0$ indiferent de geometrie sau de distribuția materialelor pe frontieră.
+Distribuția Rayleigh pentru componenta normală (nu semi-gaussiană) apare din ponderea cu fluxul de particule: o particulă cu viteză normală $v_n'$ mai mare traversează suprafața mai des, deci probabilitatea de emisie este proporțională cu $v_n' \exp(-v_n'^2/2\sigma^2)$, ceea ce dă exact distribuția Rayleigh. Această proprietate garantează bilanțul detaliat la nivel de coliziune individuală: rata de tranziție $\mathbf{v} \to \mathbf{v}'$ este egală cu rata inversă $\mathbf{v}' \to \mathbf{v}$, o condiție mai puternică decât simpla termalizare marginală. Consecința directă este că un sistem cu pereți Maxwell diffuse la aceeași temperatură $T$ satisface $J_\text{loop} = 0$ indiferent de geometrie sau de distribuția materialelor pe frontieră.
 
 \subsection{Echilibru statistic, distribuții staționare și presiune}
 
@@ -506,7 +506,7 @@ Factorul $\sqrt{1 - e_n^2}$ la zgomotul normal și $\sqrt{1 - \beta_t^2}$ la cel
 
 \textbf{MaxwellDiffuse} (perete fizic real la temperatura $T$):
 
-Modelul Maxwell diffuse implementează condiția la limită a unui perete fizic real aflat la temperatura uniformă $T$. Principiul fizic este că molecula care lovește peretele intră în contact cu rețeaua cristalină a materialului și \emph{uită complet} viteza de intrare — echivalentul acomodării termice complete. Viteza de ieșire este trasă independent din distribuția termică a peretelui:
+Modelul Maxwell diffuse implementează condiția la limită a unui perete fizic real aflat la temperatura uniformă $T$. Principiul fizic este că molecula care lovește peretele intră în contact cu rețeaua cristalină a materialului și \emph{uită complet} viteza de intrare, echivalentul acomodării termice complete. Viteza de ieșire este trasă independent din distribuția termică a peretelui:
 
 \begin{equation}
     v_t' \sim \mathcal{N}(0,\, s^2)\text{ pe planul tangent},
@@ -552,18 +552,18 @@ Pentru \texttt{ElasticBounce}: componenta normală a vitezei se inversează exac
 
 Pentru \texttt{DampedBounce}: cu $e_n = 0{,}5$ și $\beta_t = 1{,}0$, componenta normală se reduce la jumătate; cu $e_n = 1{,}0$ și $\beta_t = 0{,}3$, componenta tangențială se reduce la $0{,}3$ din valoarea inițială. Aceste teste verifică că parametrii materialului sunt aplicați pe axele corecte.
 
-Pentru \texttt{OUBounce}: (1) viteza normală de ieșire $v_n' = \mathbf{v}'\cdot\hat{n}$ este strict pozitivă pentru 100 de viteze incidente aleatoare — particula iese întotdeauna spre interior; (2) aplicând ricoșeul pe 5\,000 de viteze incidente gaussiene, varianța componentelor tangențiale ale vitezelor de ieșire este $\sigma^2 \in [0{,}9, 1{,}1]$, confirmând termalizarea la $k_BT/m = 1$; (3) implementarea batch (vectorizată pe $N$ particule simultan) produce aceeași statistică ca implementarea single-particle.
+Pentru \texttt{OUBounce}: (1) viteza normală de ieșire $v_n' = \mathbf{v}'\cdot\hat{n}$ este strict pozitivă pentru 100 de viteze incidente aleatoare, deci particula iese întotdeauna spre interior; (2) aplicând ricoșeul pe 5\,000 de viteze incidente gaussiene, varianța componentelor tangențiale ale vitezelor de ieșire este $\sigma^2 \in [0{,}9, 1{,}1]$, confirmând termalizarea la $k_BT/m = 1$; (3) implementarea batch (vectorizată pe $N$ particule simultan) produce aceeași statistică ca implementarea single-particle.
 
 Pentru \texttt{MaxwellDiffuse}: (1) viteza normală de ieșire este strict pozitivă pentru 200 de viteze incidente aleatoare; (2) corelația dintre $|\mathbf{v}_\text{in}|$ și componenta normală de ieșire este $|r| < 0{,}05$ pe 3\,000 de coliziuni, confirmând că viteza de ieșire este complet independentă de cea de intrare; (3) componenta normală de ieșire urmează distribuția Rayleigh: media măsurată $\bar{v}_n = \sigma\sqrt{\pi/2}$ și varianța $\sigma^2(2 - \pi/2)$ cu $\sigma = \sqrt{k_BT/m}$, verificate cu toleranță $0{,}05$; (4) componentele tangențiale au varianță $\approx k_BT/m$; (5) implementarea batch produce aceeași statistică.
 
 \paragraph{Teste echilibru Langevin (3 teste).}
 Al treilea grup verifică comportamentul termodinamic la nivel de simulare completă, nu doar la nivel de coliziune individuală.
 
-\emph{Menținerea echilibrului}: pornind de la viteze Maxwell--Boltzmann ($N=1\,000$, 1\,000 pași), $\langle v^2 \rangle$ rămâne în intervalul $[2{,}7, 3{,}3]$ — eroare relativă sub 10\%.
+\emph{Menținerea echilibrului}: pornind de la viteze Maxwell--Boltzmann ($N=1\,000$, 1\,000 pași), $\langle v^2 \rangle$ rămâne în intervalul $[2{,}7, 3{,}3]$, eroare relativă sub 10\%.
 
-\emph{Relaxare din starea rece}: pornind cu toate vitezele nule ($N=1\,000$, 3\,000 pași), $\langle v^2 \rangle$ convergează la $3{,}0 \pm 0{,}45$ — sistemul se încălzește la temperatura de rezervor prin dinamica Langevin și OUBounce la perete.
+\emph{Relaxare din starea rece}: pornind cu toate vitezele nule ($N=1\,000$, 3\,000 pași), $\langle v^2 \rangle$ convergează la $3{,}0 \pm 0{,}45$; sistemul se încălzește la temperatura de rezervor prin dinamica Langevin și OUBounce la perete.
 
-\emph{Conservarea numărului de particule în geometrie complexă}: după 500 de pași în \texttt{loop\_chambers} cu 500 de particule, niciuna nu are \texttt{piece\_idx} $= -1$ (indicator de pierdere din domeniu). Acesta verifică robustețea algoritmului de reflecție la joncțiunile dintre primitive — colțuri și muchii — unde normala locală poate fi ambiguă.
+\emph{Conservarea numărului de particule în geometrie complexă}: după 500 de pași în \texttt{loop\_chambers} cu 500 de particule, niciuna nu are \texttt{piece\_idx} $= -1$ (indicator de pierdere din domeniu). Acesta verifică robustețea algoritmului de reflecție la joncțiunile dintre primitive (colțuri și muchii) unde normala locală poate fi ambiguă.
 
 Împreună, cele 30 de teste acoperă separat fiecare nivel al implementării, permițând localizarea rapidă a oricărei regresii și oferind garanția că rezultatele fizice nu sunt contaminate de artefacte numerice la frontiere.
 
@@ -675,31 +675,31 @@ OUBounce         & eterogen & 0{,}01 & 2\,337 & $+1{,}97\times10^{-2}$ & $2{,}46
 ElasticBounce    & —        & 0{,}01 & 3\,315 & $+1{,}83\times10^{-2}$ & $2{,}29\times10^{-3}$ & tranzitoriu$^*$ \\
 \bottomrule
 \end{tabular}
-\caption{Curentul net $J_\text{loop}$ și asimetria maximă de flux $R_\text{max}$ pentru diferite modele de perete ($N=30\,000$, $t=300\,000$ pași pentru $\gamma=1$; $t=30\,000$ pași pentru $\gamma=0{,}01$). La $\gamma=1$, toate modelele termalizante produc $J_\text{loop}$ de ordinul zgomotului statistic — echilibru termodinamic. La $\gamma=0{,}01$ ($\tau_v = 100$), sistemul nu a atins echilibrul indiferent de modelul de perete ($^*$tranzitoriu).}
+\caption{Curentul net $J_\text{loop}$ și asimetria maximă de flux $R_\text{max}$ pentru diferite modele de perete ($N=30\,000$, $t=300\,000$ pași pentru $\gamma=1$; $t=30\,000$ pași pentru $\gamma=0{,}01$). La $\gamma=1$, toate modelele termalizante produc $J_\text{loop}$ de ordinul zgomotului statistic, compatibil cu echilibrul termodinamic. La $\gamma=0{,}01$ ($\tau_v = 100$), sistemul nu a atins echilibrul indiferent de modelul de perete ($^*$tranzitoriu).}
 \label{tab:jloop}
 \end{table}
 
 Rezultatele arată că la $\gamma=1$ și număr suficient de tranziții, toate modelele termalizante produc $J_\text{loop} \approx 0$. Valorile mari observate în rulările scurte (câteva sute de tranziții) sunt artefacte statistice, nu curenți reali.
 
-Diferența fundamentală între modele nu este în starea de echilibru finală, ci în \emph{garanția teoretică} cu care aceasta este atinsă. Modelul Maxwell diffuse satisface bilanțul detaliat la nivel de coliziune individuală — viteza de ieșire este complet independentă de viteza de intrare, ceea ce garantează $J_\text{loop} = 0$ prin construcție. OUBounce satisface FDT local (distribuția marginală de ieșire e MB), dar viteza de ieșire depinde parțial de cea de intrare prin termenul $e_n|v_{n}^\text{in}|$, ceea ce rupe bilanțul detaliat microscopic. La $\gamma=1$, efectul e compensat de Langevin în volum și nu se observă diferență practică. Această distincție devine importantă în regimuri balistice ($\gamma \ll 1$) sau pentru geometrii cu rate de coliziune foarte asimetrice.
+Diferența fundamentală între modele nu este în starea de echilibru finală, ci în \emph{garanția teoretică} cu care aceasta este atinsă. Modelul Maxwell diffuse satisface bilanțul detaliat la nivel de coliziune individuală: viteza de ieșire este complet independentă de viteza de intrare, ceea ce garantează $J_\text{loop} = 0$ prin construcție. OUBounce satisface FDT local (distribuția marginală de ieșire e MB), dar viteza de ieșire depinde parțial de cea de intrare prin termenul $e_n|v_{n}^\text{in}|$, ceea ce rupe bilanțul detaliat microscopic. La $\gamma=1$, efectul e compensat de Langevin în volum și nu se observă diferență practică. Această distincție devine importantă în regimuri balistice ($\gamma \ll 1$) sau pentru geometrii cu rate de coliziune foarte asimetrice.
 
 \section{Concluzii}
 \label{sec:concluzii}
 
-Această lucrare a studiat mișcarea Browniană a unui ansamblu de particule independente într-o geometrie de confinare complexă — două camere cuplate printr-un canal cu pâlnie asimetrică și un canal de retur — cu accent pe rolul condiției la limită la perete și al proprietăților materiale ale frontierelor.
+Această lucrare a studiat mișcarea Browniană a unui ansamblu de particule independente într-o geometrie de confinare complexă (două camere cuplate printr-un canal cu pâlnie asimetrică și un canal de retur), cu accent pe rolul condiției la limită la perete și al proprietăților materiale ale frontierelor.
 
 Principalele rezultate sunt:
 
 \begin{enumerate}[label=\arabic*.]
     \item \textbf{Validarea modelului numeric.} Pachetul \texttt{brownian\_sim} reproduce distribuția Maxwell--Boltzmann în geometria de referință (cutie simplă) cu erori relative sub $0{,}5\%$ față de valoarea teoretică $\langle v^2 \rangle = 3k_BT/m$. Conservarea numărului de particule este exactă în toate configurațiile simulate ($\Delta N = 0$ la fiecare pas).
 
-    \item \textbf{Condiția la limită fizic corectă: Maxwell diffuse.} Un perete fizic real la temperatura uniformă $T$ trebuie să satisfacă bilanțul detaliat la nivel de coliziune individuală: viteza de ieșire trebuie să fie complet independentă de cea de intrare. Modelul Maxwell diffuse implementat satisface această proprietate prin construcție — componenta normală urmează distribuția Rayleigh, componenta tangențială urmează o distribuție gaussiană izotropă în planul tangent — și produce $J_\text{loop} \to 0$ independent de geometrie și materiale.
+    \item \textbf{Condiția la limită fizic corectă: Maxwell diffuse.} Un perete fizic real la temperatura uniformă $T$ trebuie să satisfacă bilanțul detaliat la nivel de coliziune individuală: viteza de ieșire trebuie să fie complet independentă de cea de intrare. Modelul Maxwell diffuse implementat satisface această proprietate prin construcție (componenta normală urmează distribuția Rayleigh, componenta tangențială urmează o distribuție gaussiană izotropă în planul tangent) și produce $J_\text{loop} \to 0$ independent de geometrie și materiale.
 
     \item \textbf{Geometria singură nu produce NESS în condiții naturale.} Cu modelul Maxwell diffuse și dinamică Langevin în volum ($\gamma = 1$), curentul net $J_\text{loop}$ prin ciclul celor patru regiuni ale geometriei converge spre zero cu statistică suficientă ($N_\text{tr} \gtrsim 10\,000$ tranziții). Geometria asimetrică a canalelor cu pâlnie influențează timpii de rezidență și rata de traversare, dar nu produce un curent net persistent.
 
     \item \textbf{NESS aparent în simulări scurte este artefact statistic.} La număr mic de tranziții ($N_\text{tr} < 3\,000$), valorile $J_\text{loop}$ pot fi de ordinul $10^{-2}$, sugerând un curent net. Acestea dispar cu statistică suficientă și reprezintă fluctuații statistice ale matricei de tranziție empirice, nu un fenomen fizic real.
 
-    \item \textbf{Alegerea modelului de perete determină ce fizică apare.} Modelul DampedBounce (fără compensare stochastică) produce o răcire monotonă a sistemului — o condiție nenaturală. Modelul OUBounce reproduce distribuția MB marginală corect, dar rupe bilanțul detaliat microscopic prin dependența vitezei de ieșire de modulul celei de intrare. La $\gamma = 1$ efectul este mascat de termalizarea Langevin din volum, dar devine vizibil în regimuri balistice. Aceasta ilustrează că verificarea distribuției marginale a vitezelor nu este suficientă pentru validarea echilibrului termodinamic — este necesară și verificarea curentului net $J_\text{loop}$.
+    \item \textbf{Alegerea modelului de perete determină ce fizică apare.} Modelul DampedBounce (fără compensare stochastică) produce o răcire monotonă a sistemului, o condiție nenaturală. Modelul OUBounce reproduce distribuția MB marginală corect, dar rupe bilanțul detaliat microscopic prin dependența vitezei de ieșire de modulul celei de intrare. La $\gamma = 1$ efectul este mascat de termalizarea Langevin din volum, dar devine vizibil în regimuri balistice. Aceasta ilustrează că verificarea distribuției marginale a vitezelor nu este suficientă pentru validarea echilibrului termodinamic; este necesară și verificarea curentului net $J_\text{loop}$.
 \end{enumerate}
 
 Limitele principale ale modelului sunt absența coliziunilor interparticulare și numărul finit de particule, care introduc fluctuații statistice la timpi scurți. Aceste simplificări sunt intenționate: ele permit izolarea clară a efectelor geometriei și ale frontierelor.

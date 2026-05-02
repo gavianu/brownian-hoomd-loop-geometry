@@ -41,7 +41,7 @@ for d in dirs:
             states, C = load_counts(None, str(tr))
             mc = detailed_balance_metrics(states, C)
             J, _, _ = loop_current(mc["R"], mc["states"])
-            verdict = ness_verdict(mc["Rmax"], mc["sigma"], J)
+            verdict = ness_verdict(mc["Rmax"], mc["sigma"], J, n_transitions=mc["transitions"])
             # citim numarul de pasi din piece_counts
             pc = d / "piece_counts.csv"
             steps = 0

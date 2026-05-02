@@ -138,10 +138,20 @@ def ness_verdict(
     Rmax: float,
     sigma: float,
     J_loop: float,
-    thr_Rmax: float = 1e-4,
-    thr_sigma: float = 1e-5,
+    n_transitions: int = 0,
+    thr_sigma: float = 1e-4,
+    k_noise: float = 5.0,
 ) -> str:
-    """Returneaza 'echilibru' sau 'NESS' pe baza pragurilor."""
-    if Rmax <= thr_Rmax and abs(sigma) <= thr_sigma and abs(J_loop) <= thr_Rmax:
+    """Returneaza 'echilibru' sau 'NESS'.
+
+    Pragul pentru Rmax si J_loop este adaptat la zgomotul statistic:
+    thr = k_noise / sqrt(n_transitions), cu k_noise=5 (5 deviatii standard).
+    La n_transitions=0 se foloseste pragul fix 1e-3.
+    """
+    if n_transitions > 0:
+        thr = k_noise / math.sqrt(n_transitions)
+    else:
+        thr = 1e-3
+    if Rmax <= thr and abs(J_loop) <= thr and abs(sigma) <= thr_sigma:
         return "echilibru"
     return "NESS"
