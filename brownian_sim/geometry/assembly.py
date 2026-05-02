@@ -12,7 +12,7 @@ Assembly furnizează doar geometria (snap + normală).
 """
 from __future__ import annotations
 
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 import numpy as np
 
@@ -84,13 +84,40 @@ class Assembly:
                 idx[j] = int(rng.choice(cand))
         return idx
 
-    # ---- reflecție geometrică (per-point) ----
+    # ---- reflecție geometrică ----
 
     def snap_and_normal(
         self, p_new: np.ndarray, piece_idx: int
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Returnează (p_snap, n) pentru un singur punct care a ieșit din piece_idx."""
         return self.pieces[piece_idx].shape.snap_and_normal(p_new)
+
+    def snap_and_normal_batch(
+        self,
+        p_new: Any,
+        prev_piece_idx: Any,
+        xp: Any,
+    ) -> Tuple[Any, Any]:
+        """Versiunea vectorizată: reflectă toate particulele ieșite simultan.
+
+        p_new:          (N, 3) — pozițiile propuse (unele ieșite)
+        prev_piece_idx: (N,) int — piesa din care a plecat fiecare particulă
+        xp:             modulul array (numpy sau cupy)
+
+        Returnează (p_snap, n) ambele (N, 3).
+        Particulele care nu au ieșit primesc n = 0 (caller verifică norma).
+        """
+        p_snap = p_new.copy()
+        n_out = xp.zeros_like(p_new)
+
+        for k, pc in enumerate(self.pieces):
+            mask = prev_piece_idx == k
+            if not xp.any(mask):
+                continue
+            ps, ns = pc.shape.snap_and_normal_batch(p_new[mask], xp)
+            p_snap[mask] = ps
+            n_out[mask] = ns
+        return p_snap, n_out
 
     def wall_distance(self, p: np.ndarray, piece_idx: int) -> float:
         return self.pieces[piece_idx].shape.wall_distance(p)

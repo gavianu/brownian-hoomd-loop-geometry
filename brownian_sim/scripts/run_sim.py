@@ -78,6 +78,7 @@ def main() -> int:
     ap.add_argument("--config", "-c", required=True, type=Path, help="path to YAML config")
     ap.add_argument("--steps", type=int, default=None, help="override steps")
     ap.add_argument("--n", type=int, default=None, help="override n_particles")
+    ap.add_argument("--device", type=int, default=None, help="GPU device index (0,1,...); -1 sau absent = CPU")
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
 
@@ -91,6 +92,8 @@ def main() -> int:
         sim_cfg_raw["steps"] = args.steps
     if args.n is not None:
         sim_cfg_raw["n_particles"] = args.n
+    if args.device is not None:
+        sim_cfg_raw["device"] = args.device
     if args.quiet:
         sim_cfg_raw["quiet"] = True
 

@@ -45,17 +45,18 @@ Ruleaza in doua terminale separate (sau secvential):
 
 **Terminal 1 — Maxwell diffuse, 100k pasi:**
 ```bash
-python -m brownian_sim.scripts.run_sim --config configs/loop_maxwell_gpu_100k.yaml
+python -m brownian_sim.scripts.run_sim --config configs/loop_maxwell_gpu_100k.yaml --device 0
 ```
-Estimat: ~15 minute pe CPU, ~2-3 minute pe GPU (dupa vectorizare geometrie).
 Output: `sim_out/loop_maxwell_gpu_100k/`
 
 **Terminal 2 — OUBounce, 50k pasi:**
 ```bash
-python -m brownian_sim.scripts.run_sim --config configs/loop_ou_gpu_50k.yaml
+python -m brownian_sim.scripts.run_sim --config configs/loop_ou_gpu_50k.yaml --device 0
 ```
-Estimat: ~8 minute pe CPU, ~1-2 minute pe GPU.
 Output: `sim_out/loop_ou_gpu_50k/`
+
+Nota: `--device 0` activeaza GPU pentru pasii Langevin si bounce_batch.
+`inside_any` si `locate` raman pe CPU (geometrie SDF) — bottleneck ramas.
 
 ---
 
