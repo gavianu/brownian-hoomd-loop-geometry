@@ -3,9 +3,8 @@ __pycache__/
 *.py[codz]
 *$py.class
 
-*out*
-*out*/*.*
 sim_out/
+# results/ este versionat intentionat — doar CSV-uri, fara GSD
 
 # Private correspondence (nu se urcă pe GitHub)
 WhatsApp Chat*.zip
