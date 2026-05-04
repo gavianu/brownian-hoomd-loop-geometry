@@ -1,87 +1,123 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[margin=1in]{geometry}
+\documentclass[12pt,openright,twoside]{book}
+\usepackage{graphicx}
+\usepackage[a4paper,left=25mm,right=25mm,top=25mm,bottom=30mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[romanian]{babel}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb,amsthm}
-\usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{dirtree}
 \usepackage{float}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{pdflscape}
+
+\titleformat{\chapter}
+  {\Large\bfseries}
+  {}
+  {0pt}
+  {\LARGE}
+
+\renewcommand{\figurename}{\textbf{Figura}}
+\renewcommand{\tablename}{\textbf{Tabelul}}
+\newcommand{\HRule}{\rule{\linewidth}{0.4mm}}
+\renewcommand{\contentsname}{{\Huge Cuprins}}
+\renewcommand{\chaptername}{{\Huge  }}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.8\baselineskip}
-
-\title{Simularea dinamicii moleculare a unui gaz ideal în geometrii de confinare complexe}
-\author{Octavian \textsc{Stirbei}\\
-Facultatea de Fizică, Universitatea din București\\
-Fizică Tehnologică, promoția 2002--2007\\
-Specializarea Electronică Aplicată, Metrologia și Optica}
-\date{Mai 2026}
+\setcounter{tocdepth}{2}
 
 \begin{document}
-\maketitle
 
-\tableofcontents
+% --- Pagina de titlu ---
+\begin{titlepage}
+\begin{center}
+
+\includegraphics[width=16cm]{./antet_L.jpg}
+
+\vspace{3cm}
+
+\HRule \\[0.3cm]
+{\Large \textsc{Simularea dinamicii moleculare a unui gaz ideal în geometrii de confinare complexe}}\\
+\HRule \\[1.1cm]
+
+\textsc{\large Lucrare de Licență}\\[4cm]
+
+\begin{flushleft} \large
+  {Absolvent} \\[0.1cm]
+  Octavian \textsc{Stirbei}\\
+  Facultatea de Fizică, Universitatea din București\\
+  Fizică Tehnologică
+\end{flushleft}
+
+\begin{flushright} \large
+  {Conducător științific} \\[0.1cm]
+  Lect. dr. Dragoș \textsc{Palade}
+\end{flushright}
+
+\vfill
+{\large București, 2026}
+
+\end{center}
+\end{titlepage}
+
+% --- Pagina alba verso ---
 \newpage
+\vspace*{\fill}
+\thispagestyle{empty}
 
-\section{Introducere}
+% --- Cuprins ---
+\newpage
+\thispagestyle{plain}
+\pagenumbering{roman}
+\vspace*{\fill}
+\tableofcontents
+
+\setlength\parindent{0pt}
+\setcounter{page}{0}
+
+\newpage
+\pagenumbering{arabic}
+
+% ============================================================
+\chapter{Introducere}
+\label{sec:introducere}
+% ============================================================
 
 Studiul sistemelor formate din multe particule se află în centrul fizicii moderne deoarece face legătura între lumea microscopică, descrisă prin mișcarea individuală a corpurilor elementare, și lumea macroscopică, în care observăm presiune, temperatură, densitate, curgere, difuzie sau relaxare către echilibru. Una dintre ideile fundamentale ale fizicii statistice este că aceste mărimi macroscopice nu trebuie privite ca proprietăți independente, ci ca efecte colective rezultate din dinamica unui număr foarte mare de grade de libertate~\cite{reif2009}. Din acest punct de vedere, gazul ideal constituie unul dintre cele mai importante modele teoretice: este suficient de simplu pentru a putea fi analizat clar și suficient de bogat pentru a ilustra mecanisme esențiale ale teoriei cinetice și ale echilibrului statistic~\cite{maxwell1860}.
 
 Interesul pentru gazul ideal nu este doar istoric sau pedagogic. Chiar dacă în practică niciun gaz real nu respectă perfect toate ipotezele modelului ideal, acesta rămâne cadrul conceptual în care pot fi separate cu precizie efectele fundamentale ale mișcării particulelor de efectele suplimentare produse de interacții, corelații sau structuri interne mai complicate. În numeroase situații, primul pas în înțelegerea unui sistem complex constă tocmai în studierea versiunii sale idealizate. Odată înțeles acest caz de bază, devine posibilă evaluarea clară a rolului jucat de ingredientele suplimentare. În această lucrare, interesul principal nu cade pe interacțiile dintre particule, ci pe interacția dintre două tipuri de constrângeri: constrângerea geometrică impusă de domeniul de confinare și constrângerea fizică impusă de proprietățile materialelor din care sunt alcătuiți pereții. Tocmai de aceea modelul de gaz ideal este alegerea naturală: el permite izolarea efectului frontierelor fără complicația suplimentară a coliziunilor interparticulare.
 
-Din punct de vedere microscopic, un gaz ideal este format din particule considerate punctiforme sau suficient de mici pentru ca volumul lor propriu să poată fi neglijat în raport cu volumul total disponibil. În plus, aceste particule nu exercită forțe unele asupra altora și nu schimbă energie prin interacții mutuale directe. Mișcarea lor este liberă între două evenimente succesive de contact cu frontiera domeniului. Această descriere simplă are o consecință importantă: dacă nu există interacții între particule, atunci singurele elemente capabile să organizeze dinamica sistemului sunt condițiile inițiale și condițiile la limită. În modelul studiat aici, condițiile la limită nu înseamnă doar forma spațiului accesibil, ci și natura fizică a frontierelor: un perete poate reflecta aproape elastic, poate amortiza selectiv anumite componente ale vitezei sau poate acționa ca o frontieră termalizantă care menține particulele în contact cu un mediu aflat la aceeași temperatură efectivă, evitând astfel introducerea artificială a unui perete rece.
+Din punct de vedere microscopic, un gaz ideal este format din particule considerate punctiforme, care nu exercită forțe unele asupra altora. Mișcarea lor este liberă între două evenimente succesive de contact cu frontiera domeniului. Această descriere are o consecință importantă: dacă nu există interacții între particule, atunci singurele elemente capabile să organizeze dinamica sunt condițiile inițiale și condițiile la limită. În modelul studiat aici, condițiile la limită nu înseamnă doar forma spațiului accesibil, ci și natura fizică a frontierelor: un perete poate reflecta aproape elastic, poate amortiza selectiv anumite componente ale vitezei sau poate acționa ca o frontieră termalizantă care menține particulele în contact cu un mediu la aceeași temperatură efectivă.
 
-Această observație plasează problema lucrării într-un context fizic mai larg. În formularea clasică a teoriei cinetice, proprietăți precum presiunea și temperatura apar din media statistică a mișcărilor individuale ale particulelor. Presiunea poate fi înțeleasă ca efect al transferului de impuls către pereți, iar temperatura ca o măsură a agitației microscopice. Totuși, pentru ca aceste mărimi să dobândească sens operațional într-un sistem finit, este necesară existența unui domeniu delimitat. Fără pereți sau fără o formă de confinare, noțiunile de distribuție spațială stabilă, densitate locală sau schimb de impuls cu frontiera își pierd o parte importantă din semnificație. Din acest motiv, în analiza unui gaz ideal confinat, pereții nu reprezintă doar un detaliu geometric, ci o componentă constitutivă a modelului fizic. Mai mult, în cazul de față, frontiera trebuie înțeleasă și ca interfață materială: aceeași geometrie poate conduce la răspunsuri diferite dacă suprafețele care o delimitează au proprietăți de ricoșeu, disipare sau termalizare diferite.
+Această observație plasează problema lucrării într-un context fizic mai larg. În formularea clasică a teoriei cinetice, proprietăți precum presiunea și temperatura apar din media statistică a mișcărilor individuale ale particulelor~\cite{cercignani1988}. Pentru ca aceste mărimi să dobândească sens operațional într-un sistem finit, este necesară existența unui domeniu delimitat. Din acest motiv, în analiza unui gaz ideal confinat, pereții nu reprezintă doar un detaliu geometric, ci o componentă constitutivă a modelului fizic. În cazul de față, frontiera trebuie înțeleasă și ca interfață materială: aceeași geometrie poate conduce la răspunsuri diferite dacă suprafețele care o delimitează au proprietăți de ricoșeu, disipare sau termalizare diferite.
 
-Rolul pereților este, în modelul de față, dublu în sens geometric și triplu în sens fizic. Pe de o parte, ei delimitează spațiul accesibil particulelor și definesc structura geometrică a sistemului. Pe de altă parte, prin coliziunile particulă--perete, ei determină modul în care direcțiile de mișcare sunt redistribuite și modul în care impulsul este transferat la scară macroscopică. În plus, prin alegerea proprietăților materiale ale fiecărei porțiuni de frontieră, ei pot conserva aproape integral energia la ricoșeu, o pot atenua selectiv sau pot menține un contact termic efectiv cu particulele. Într-o cutie simplă, cu pereți ideali, acest rol poate părea aproape trivial. Într-un ansamblu compus din regiuni și materiale diferite, însă, peretele devine o parte activă a modelului și nu doar marginea exterioară a domeniului.
+Această idee devine cu atât mai importantă atunci când frontiera nu mai este simplă. În geometrii de confinare complexe, traiectoriile individuale ale particulelor pot fi influențate puternic de curbură, de prezența unor gâturi înguste sau de conectarea mai multor camere prin canale. Chiar dacă particulele nu interacționează între ele, geometria poate induce o dinamică mult mai bogată decât în cazul unei cutii obișnuite. Unele regiuni pot fi explorate rapid, altele mai greu; unele configurații pot favoriza amestecarea, în timp ce altele pot conduce la relaxare lentă sau la acumulări temporare. Cu alte cuvinte, geometria poate funcționa ca un mecanism efectiv de selecție și reorganizare a traiectoriilor.
 
-Această idee devine cu atât mai importantă atunci când frontiera nu mai este simplă. În geometrii de confinare complexe, traiectoriile individuale ale particulelor pot fi influențate puternic de curbură, de prezența unor gâturi înguste, de conectarea mai multor camere prin canale sau de existența unor obstacole interne. Chiar dacă particulele nu interacționează între ele, geometria poate induce o dinamică mult mai bogată decât în cazul unei cutii obișnuite. Unele regiuni pot fi explorate rapid, altele pot fi accesate mai greu; unele configurații pot favoriza amestecarea, în timp ce altele pot conduce la relaxare lentă sau la acumulări temporare în anumite zone ale domeniului. Cu alte cuvinte, geometria poate funcționa ca un mecanism efectiv de selecție și reorganizare a traiectoriilor.
+Interesul pentru asemenea probleme nu este doar teoretic. Multe sisteme reale implică particule sau molecule care se deplasează în medii confinate: micro-canale, materiale poroase, sisteme coloidale, medii biologice aglomerate, structuri nanometrice sau volume compartimentate~\cite{squires2005,drescher2011}. Chiar dacă modelul prezentat în această lucrare nu urmărește descrierea detaliată a tuturor acestor cazuri, el captează un mecanism general: comportamentul sistemului este determinat de cuplajul dintre geometrie, proprietățile materialelor de la frontieră și condiția termică impusă la contactul cu pereții.
 
-Din perspectiva fizicii statistice, acest aspect este deosebit de interesant deoarece arată că un comportament colectiv aparent complex nu necesită întotdeauna interacții microscopice complicate. Uneori, complexitatea emergentă apare deja din combinația dintre mișcare liberă și constrângeri geometrice. În astfel de sisteme, întrebările centrale nu mai sunt doar legate de energia particulelor sau de numărul lor, ci și de forma domeniului, de conectivitatea lui, de existența unor bariere entropice și de timpii caracteristici în care diferite regiuni devin accesibile. Din acest motiv, studiul geometriilor complexe se află la intersecția dintre fizica statistică, teoria transportului și analiza sistemelor dinamice.
+Multe rezultate pot fi obținute analitic sau prin argumente de teorie cinetică pentru geometrii simple. Totuși, odată ce forma domeniului devine mai complicată, urmărirea evoluției unui ansamblu mare de particule permite reconstruirea statisticilor relevante și compararea directă între geometrii diferite și între frontiere cu proprietăți materiale distincte. În contextul acestei lucrări, accentul rămâne pe interpretarea fizică: formularea teoretică stabilește ipotezele și întrebările, iar analiza urmărește consecințele lor într-un mediu geometric și material mai bogat decât cel tratabil complet prin calcule elementare.
 
-Interesul pentru asemenea probleme nu este doar teoretic. Multe sisteme reale implică particule, molecule sau purtători de masă care se deplasează în medii confinate. Exemple relevante apar în micro-canale, în materiale poroase, în sisteme coloidale, în medii biologice aglomerate, în structuri nanometrice sau în volume compartimentate în care transportul este controlat atât de arhitectura spațială a mediului, cât și de natura suprafețelor cu care particulele intră în contact. Chiar dacă modelul prezentat în această lucrare nu urmărește descrierea detaliată a tuturor acestor cazuri, el captează un mecanism general: comportamentul sistemului este determinat de cuplajul dintre geometrie, proprietățile materialelor de la frontieră și condiția termică impusă la contactul cu pereții. Din acest motiv, analiza unui gaz ideal confinat într-un domeniu complex, cu frontiere material neomogene, reprezintă un punct de plecare valoros pentru probleme mai generale de transport în medii structurate.
+Obiectivul principal al acestei teze este studiul comportamentului unui gaz ideal într-un domeniu de confinare geometric complex, delimitat de frontiere cu proprietăți materiale diferite, prin intermediul simulărilor de dinamică moleculară stocastică. Lucrarea urmărește să clarifice modul în care geometria domeniului, natura materială a pereților și condiția de termalizare la frontieră influențează distribuțiile spațiale, schimbul de impuls și apariția unor eventuale stări staționate de neechilibru.
 
-În plus, geometriile complexe sunt interesante și pentru că pot evidenția diferența dintre intuiția geometrică simplă și comportamentul statistic efectiv al sistemului. Nu este întotdeauna evident dacă o regiune mai îngustă va accelera sau va încetini omogenizarea, dacă o cavitate laterală va acționa doar ca un volum pasiv sau ca o zonă de retenție temporară, ori dacă o succesiune de compartimente conectate va favoriza amestecarea sau, dimpotrivă, separarea temporală a populațiilor de particule. Astfel de întrebări nu pot fi rezolvate satisfăcător doar prin intuiție calitativă. Ele cer un cadru conceptual clar și o analiză capabilă să urmărească fidel consecințele statistice ale dinamicii microscopice pe intervale suficient de lungi.
+Structura tezei urmează această logică. Capitolul~\ref{sec:fundamente} prezintă fundamentele teoretice: modelul gazului ideal, dinamica Langevin, modelele de interacție particulă--perete și observabilele statistice relevante. Capitolul~\ref{sec:model} descrie implementarea numerică: arhitectura pachetului de simulare, reprezentarea geometriei, algoritmul de integrare și testele de verificare. Capitolul~\ref{sec:rezultate} prezintă rezultatele simulărilor, de la cazul de referință la geometria complexă și testul de echilibru termodinamic. Capitolul~\ref{sec:concluzii} sintetizează concluziile și indică direcțiile de extindere.
 
-Pentru sisteme simple, multe rezultate pot fi obținute analitic sau prin argumente generale de teorie cinetică. Totuși, odată ce forma domeniului devine mai complicată, calculul explicit al traiectoriilor, al distribuțiilor spațiale și al timpilor de relaxare devine dificil. Din acest motiv, studiul teoretic este în mod natural completat de urmărirea evoluției unui ansamblu mare de particule, ceea ce permite reconstruirea statisticilor relevante și compararea directă între geometrii diferite și între frontiere cu proprietăți materiale distincte. În contextul acestei lucrări, accentul rămâne pe interpretarea fizică: formularea teoretică stabilește ipotezele și întrebările, iar analiza ulterioară urmărește consecințele lor într-un mediu geometric și material mai bogat decât cel tratabil complet prin calcule elementare.
-
-Este important de subliniat că alegerea unui model idealizat nu diminuează relevanța fizică a problemei, ci o clarifică. Prin eliminarea interacțiilor interparticulare, devine posibilă observarea mai directă a influenței pereților și a formei domeniului. Într-un model mai realist, efectele geometriei s-ar amesteca imediat cu efectele coliziunilor dintre particule, cu procese de termalizare internă, cu variații locale de densitate și cu o serie de alte mecanisme. În schimb, în modelul ales aici, orice fenomen de amestecare diferențială, de acumulare temporară sau de relaxare neuniformă poate fi atribuit mult mai clar geometriei și condițiilor la limită. Din punct de vedere metodologic, aceasta este o strategie foarte utilă: se pornește de la problema cea mai transparentă și se studiază separat mecanismul de interes.
-
-În același timp, din perspectiva teoriei cinetice, problema este interesantă deoarece obligă la o reflecție atentă asupra sensului echilibrului. Într-un gaz ideal fără coliziuni interparticulare, distribuțiile staționare nu trebuie interpretate automat în exact același mod ca în cazul unui gaz real aflat în echilibru termodinamic complet. Apar întrebări subtile: cât din comportamentul observat provine din condițiile inițiale, cât provine din geometrie și cât provine din regulile de interacție cu frontiera? În ce sens putem vorbi despre omogenizare? Cât de repede se pierde memoria distribuției inițiale? Ce observabile ajung la valori staționare și care pot păstra semnătura geometriei pe timp lung? Aceste întrebări justifică abordarea atentă, progresivă și în primul rând conceptuală a lucrării.
-
-O altă idee importantă, care merită subliniată încă din introducere, este că modelul de gaz ideal obligă la o distincție clară între descrierea microscopică și descrierea statistică. La nivel microscopic, fiecare particulă urmează o traiectorie bine definită, determinată de poziția și viteza sa inițială și de succesiunea coliziunilor cu frontiera. La nivel macroscopic însă, nu traiectoria unei particule individuale este relevantă, ci ansamblul configurațiilor posibile și frecvența cu care anumite regiuni ale spațiului sunt vizitate. Această trecere de la descrierea individuală la descrierea colectivă este una dintre ideile de bază ale fizicii statistice și explică de ce aceeași dinamică microscopică poate fi interpretată prin distribuții, medii, densități și timpi caracteristici.
-
-În acest sens, rolul statisticii nu este unul auxiliar, ci unul constitutiv. Chiar dacă ecuațiile de mișcare ale unei particule sunt, în principiu, simple, un sistem cu un număr mare de particule nu poate fi înțeles eficient doar prin enumerarea traiectoriilor individuale. Este necesară trecerea la o descriere globală, în care devin importante distribuția pozițiilor, distribuția vitezelor, corelația dintre regiuni ale domeniului și comportamentul mediilor în timp. Astfel, problema nu mai este doar „unde se află o particulă?”, ci „cum este ocupat spațiul accesibil de întreg ansamblul?” și „cum evoluează această ocupare atunci când geometria impune constrângeri?”. Din acest motiv, studiul gazului ideal confinat este, în egală măsură, o problemă de dinamică și o problemă de statistică.
-
-Mai mult, sistemele confinate oferă un cadru foarte bun pentru a discuta relația subtilă dintre reversibilitatea microscopică și apariția unui comportament macroscopic ireversibil. La nivelul unei particule individuale și pentru pereți perfect elastici, dinamica este compatibilă cu o descriere reversibilă. Cu toate acestea, la nivel colectiv, distribuțiile spațiale tind să se uniformizeze, iar anumite stări inițiale par să-și piardă treptat amprenta. Această tensiune între simplitatea și reversibilitatea legilor microscopice, pe de o parte, și apariția unei direcții privilegiate a evoluției statistice, pe de altă parte, este una dintre temele clasice ale fizicii statistice. În geometrii complexe, această problemă devine și mai interesantă, deoarece forma domeniului poate accelera sau frâna tocmai procesele prin care sistemul ajunge să pară macroscopic stabil.
-
-Geometria complicată introduce și noțiunea de bariere entropice, chiar și atunci când nu există bariere energetice propriu-zise. Un canal îngust, o regiune laterală slab conectată sau o succesiune de camere cu secțiuni diferite pot modifica probabilitatea cu care particulele explorează anumite zone. Astfel, dificultatea de acces într-o regiune nu provine neapărat dintr-un potențial extern, ci din numărul redus de traiectorii compatibile cu trecerea prin acea regiune. Acest tip de efect este important deoarece arată că transportul poate fi controlat nu doar prin forțe, ci și prin arhitectura spațiului disponibil. Din punct de vedere conceptual, este una dintre cele mai clare situații în care geometria se traduce direct într-o proprietate statistică.
-
-În fine, interesul pentru relaxare mai rapidă sau mai lentă, pentru amestecare eficientă ori pentru transport aparent anormal nu trebuie înțeles ca un detaliu tehnic, ci ca o expresie a unei întrebări fundamentale: cât de mult poate forma spațiului să înlocuiască mecanisme dinamice mai complicate? Dacă o anumită geometrie produce întârzieri sistematice în redistribuirea particulelor, atunci geometria însăși devine un ingredient activ al dinamicii. Dacă, dimpotrivă, o altă geometrie favorizează explorarea rapidă a întregului volum, atunci forma domeniului funcționează ca un mecanism de amestecare. Din acest motiv, geometriile complexe nu sunt doar „exemple mai dificile”, ci reprezintă chiar miezul fizic al întrebării investigate în această lucrare.
-
-
-Obiectivul principal al acestei teze este studiul comportamentului unui gaz ideal într-un domeniu de confinare geometric complex, delimitat de frontiere cu proprietăți materiale diferite, prin intermediul simulărilor de dinamică moleculară stocastică. În termeni mai concreți, lucrarea urmărește să clarifice modul în care descrierea microscopică a particulelor poate fi conectată cu observații statistice relevante atunci când spațiul accesibil nu mai este unul simplu, iar interacția cu frontiera nu mai este uniformă. Interesează în special modul în care geometria domeniului, natura materială a pereților și condiția de termalizare la frontieră influențează distribuțiile spațiale, schimbul de impuls, procesul de amestecare, apariția unor eventuale zone de retenție și timpii caracteristici de relaxare către un regim staționar. Accentul este pus pe descrierea cuplajului dintre geometrie, material și contact termic, nu doar pe una dintre aceste componente luată izolat.
-
-În acest sens, lucrarea își propune și un obiectiv metodologic: să arate că un model simplu, formulat la nivel microscopic prin ipoteze clare, poate produce întrebări relevante și rezultate utile atunci când este plasat într-un cadru geometric suficient de bogat. Nu se urmărește epuizarea tuturor extensiilor posibile ale modelului, ci stabilirea unei baze coerente pe care acestea pot fi discutate ulterior. Astfel, studiul de față poate fi privit și ca o etapă de fundamentare pentru analize viitoare, în care ar putea fi introduse interacții între particule, condiții la limită mai complexe sau geometrii și mai elaborate.
-
-Structura tezei este construită astfel încât să urmeze această logică. După introducerea de față, în care este definit cadrul conceptual al problemei și sunt motivate alegerile fizice ale modelului, urmează un capitol dedicat fundamentelor teoretice. Acolo sunt prezentate explicit ipotezele modelului, sensul noțiunilor folosite și modul în care mișcarea microscopică se leagă de observabile macroscopice. Capitolul următor trece de la descrierea teoretică la formularea operațională a problemei și la modul în care aceasta este studiată în practică.
-
-Partea a doua a lucrării este orientată către analiză și interpretare. Sunt discutate mai întâi cazuri de referință, în care geometria este simplă și comportamentul așteptat poate servi drept bază de comparație. Ulterior sunt introduse geometrii mai complexe, pentru care sunt analizate distribuțiile spațiale, diferențele de comportament între regiuni și timpii de relaxare. În final, concluziile sintetizează ce se poate afirma despre rolul geometriei și al proprietăților materialelor de la frontieră în dinamica unui gaz ideal și indică direcțiile în care modelul poate fi dezvoltat. În acest fel, întreaga lucrare urmărește un traseu coerent: de la cadrul conceptual general, la modelul fizic, apoi la interpretarea fenomenelor observate.
-
-\section{Fundamente teoretice}
+% ============================================================
+\chapter{Fundamente teoretice}
 \label{sec:fundamente}
+% ============================================================
 
-\subsection{Modelul cinematic de bază}
+\section{Modelul gazului ideal}
 
 Modelul de gaz ideal constituie una dintre idealizările fundamentale ale fizicii statistice și ale teoriei cinetice~\cite{reif2009,cercignani1988}. Importanța sa nu provine din faptul că ar descrie exhaustiv un gaz real, ci din faptul că izolează un set minim de ingrediente fizice prin care relația dintre dinamică microscopică și comportament macroscopic poate fi analizată clar. În cadrul acestei lucrări, modelul este folosit ca punct de plecare pentru studiul influenței combinate a geometriei de confinare și a proprietăților materiale ale frontierelor asupra evoluției unui ansamblu de particule.
 
-Considerăm un sistem alcătuit dintr-un număr mare de particule identice, fiecare având masă constantă $m$. Starea microscopică a sistemului este determinată, la un moment dat, de pozițiile $\mathbf{r}_i$ și vitezele $\mathbf{v}_i$ ale particulelor, cu $i=1,\dots,N$. În varianta idealizată de bază, modelul se sprijină pe următoarele ipoteze pentru mișcarea în volum, urmând ca natura frontierei să fie apoi rafinată separat:
+Considerăm un sistem alcătuit dintr-un număr mare de particule identice, fiecare având masă constantă $m$. Starea microscopică a sistemului este determinată, la un moment dat, de pozițiile $\mathbf{r}_i$ și vitezele $\mathbf{v}_i$ ale particulelor, cu $i=1,\dots,N$. Modelul se sprijină pe următoarele ipoteze pentru mișcarea în volum:
 
 \begin{enumerate}[label=\arabic*.]
     \item particulele au masă constantă și sunt tratate drept punctiforme sau cu volum propriu neglijabil;
@@ -91,13 +127,11 @@ Considerăm un sistem alcătuit dintr-un număr mare de particule identice, fiec
     \item în forma ideală elementară a modelului, ciocnirile particulă--perete sunt perfect elastice.
 \end{enumerate}
 
-Aceste ipoteze simplifică puternic problema și permit separarea efectelor pur geometrice de efectele datorate interacțiilor interparticulare. Câștigul principal este claritatea interpretării: dacă particulele nu se ciocnesc între ele, atunci rolul dominant este jucat de forma domeniului și de condițiile la limită. În acest caz, orice neomogenitate spațială, orice timp de relaxare caracteristic sau orice diferență de comportament între regiuni ale sistemului poate fi corelată direct cu geometria și cu modul de interacție cu pereții.
+Aceste ipoteze simplifică puternic problema și permit separarea efectelor pur geometrice de efectele datorate interacțiunilor interparticulare. Câștigul principal este claritatea interpretării: dacă particulele nu se ciocnesc între ele, atunci rolul dominant este jucat de forma domeniului și de condițiile la limită.
 
-Se pierde însă realismul complet al unui gaz real. În absența coliziunilor interparticulare, modelul nu descrie în mod direct termalizarea internă, transportul vâscos în sens strict, apariția unei distribuții Maxwell--Boltzmann prin schimburi reciproce de impuls sau corelațiile colective dintre particule. Din acest motiv, echilibrul trebuie înțeles într-un sens adaptat modelului: nu drept echilibru termodinamic complet al unui gaz real, ci drept un regim staționar al observabilelor relevante pentru dinamica și confinarea considerate.
+Se pierde însă realismul complet al unui gaz real. În absența coliziunilor interparticulare, modelul nu descrie în mod direct termalizarea internă, transportul vâscos în sens strict sau apariția unei distribuții Maxwell--Boltzmann prin schimburi reciproce de impuls. Din acest motiv, echilibrul trebuie înțeles ca un regim staționar al observabilelor relevante pentru dinamica și confinarea considerate.
 
-În formularea extinsă considerată aici, modelul de bază este completat prin termeni stocastici și prin condiții la limită mai generale decât ricoșeul perfect elastic. Din punct de vedere teoretic, aceasta înseamnă că gazul ideal reprezintă nucleul cinematic al descrierii, peste care se adaugă o dinamică de tip Langevin și un model de interacție cu pereții care poate fi disipativ și termalizant. Prin urmare, pentru o prezentare fidelă a modelului fizic, trebuie discutate nu numai ipotezele gazului ideal clasic, ci și extensiile stocastice și materialele de frontieră care modifică regimul de ricoșeu.
-
-În forma deterministă cea mai simplă, fiecare particulă se deplasează rectiliniu și uniform între două interacții succesive cu frontiera. Această proprietate rezultă direct din a doua lege a lui Newton aplicată în absența forțelor:
+În formularea extinsă considerată aici, modelul de bază este completat prin termeni stocastici și prin condiții la limită mai generale decât ricoșeul perfect elastic. În forma deterministă cea mai simplă, fiecare particulă se deplasează rectiliniu și uniform între două interacții succesive cu frontiera:
 
 \begin{equation}
     m\frac{d^2\mathbf{r}}{dt^2}=\mathbf{0}.
@@ -109,50 +143,35 @@ Echivalent, viteza este constantă pe fiecare interval de zbor liber,
     \frac{d\mathbf{v}}{dt}=\mathbf{0},
 \end{equation}
 
-astfel încât poziția este dată de relația bine cunoscută
+astfel încât poziția este dată de relația
 
 \begin{equation}
     \mathbf{r}(t)=\mathbf{r}_0+\mathbf{v}t.
 \end{equation}
 
-Această ecuație are o semnificație fizică esențială pentru problema de față. Ea arată că, în interiorul domeniului, traiectoria particulei nu este complicată prin mecanisme interne: forma traiectoriei este o dreaptă, iar întregul caracter nebanal al dinamicii provine din succesiunea interacțiilor cu pereții sau, în extensia stocastică, din acțiunea termenilor de fricțiune și zgomot. În consecință, chiar și atunci când legea locală de mișcare este simplă, geometria domeniului poate produce o dinamică globală foarte bogată.
+Aceasta arată că, în interiorul domeniului, traiectoria particulei nu este complicată prin mecanisme interne: întregul caracter nebanal al dinamicii provine din succesiunea interacțiilor cu pereții sau, în extensia stocastică, din acțiunea termenilor de fricțiune și zgomot.
 
-O consecință importantă este că timpul de zbor liber dintre două coliziuni succesive nu este fixat de o scară microscopică internă, ci de viteza particulei și de forma domeniului accesibil. În geometrii simple, aceste timpuri pot avea distribuții relativ regulate. În geometrii complexe, în schimb, pot apărea diferențe mari între regiunile largi și cele înguste, între camere și canale sau între trasee cu conectivitate diferită. Astfel, chiar înainte de introducerea zgomotului stocastic, geometria controlează în mod substanțial statisticile mișcării.
-
-În modelul clasic ideal, pereții sunt considerați rigizi și perfect elastici. În acest caz, coliziunea cu frontiera este descrisă prin reflexie speculară. Fie $\hat{\mathbf{n}}$ normala unitară la suprafață, orientată spre interiorul domeniului. Viteza incidentă $\mathbf{v}$ se poate descompune într-o componentă normală și una tangențială,
+În modelul clasic ideal, pereții sunt considerați rigizi și perfect elastici. Fie $\hat{\mathbf{n}}$ normala unitară la suprafață, orientată spre interiorul domeniului. Viteza incidentă $\mathbf{v}$ se poate descompune într-o componentă normală și una tangențială,
 
 \begin{equation}
-    \mathbf{v}=\mathbf{v}_n+\mathbf{v}_t,
-\end{equation}
-
-unde
-
-\begin{equation}
+    \mathbf{v}=\mathbf{v}_n+\mathbf{v}_t, \qquad
     \mathbf{v}_n=(\mathbf{v}\cdot\hat{\mathbf{n}})\hat{\mathbf{n}},
     \qquad
     \mathbf{v}_t=\mathbf{v}-\mathbf{v}_n.
 \end{equation}
 
-Pentru o reflexie speculară ideală, componenta normală își schimbă semnul, iar componenta tangențială se conservă. Rezultă relația
+Pentru o reflexie speculară ideală, componenta normală își schimbă semnul, iar componenta tangențială se conservă:
 
 \begin{equation}
     \mathbf{v}'=\mathbf{v}-2(\mathbf{v}\cdot\hat{\mathbf{n}})\hat{\mathbf{n}}.
     \label{eq:specular_reflection}
 \end{equation}
 
-Aceasta implică imediat conservarea energiei cinetice,
+Aceasta implică conservarea energiei cinetice, $|\mathbf{v}'|^2=|\mathbf{v}|^2$: peretele nu disipă energie, ci doar redirecționează mișcarea.
 
-\begin{equation}
-    \frac{m}{2}|\mathbf{v}'|^2=\frac{m}{2}|\mathbf{v}|^2,
-\end{equation}
+\section{Dinamica Langevin și procesul Ornstein--Uhlenbeck}
 
-ceea ce exprimă faptul că peretele nu disipă energie, ci doar redirecționează mișcarea. În plus, impulsul normal al particulei se modifică la coliziune, iar tocmai această variație stă la baza interpretării microscopice a presiunii.
-
-În practică, această descriere este naturală pentru frontiere netede. Totuși, în geometrii cu colțuri, muchii sau intersecții între suprafețe, noțiunea de normală locală poate deveni ambiguă. Într-un astfel de caz, problema nu mai este una de principiu fizic, ci una de formulare coerentă a coliziunii la o frontieră cu singularități geometrice. Dacă o particulă ajunge într-o vecinătate unde mai multe suprafețe pot fi active simultan, trebuie stabilit ce suprafață controlează ricoșeul și cum se interpretează local interacția cu peretele. Această dificultate justifică separarea clară dintre modelul teoretic ideal al reflexiei și tratamentul particular al unor geometrii neregulate.
-
-\subsection{Dinamica Langevin și procesul Ornstein--Uhlenbeck}
-
-Modelul fizic adoptat aici nu se limitează la mișcarea rectilinie uniformă între ricoșeuri. El introduce în volum o dinamică de tip Langevin pentru viteză~\cite{langevin1908,einstein1905}, ceea ce înseamnă că particulele sunt supuse simultan unui termen disipativ și unui termen de zgomot termic. La nivel continuu, un model standard de acest tip poate fi scris sub forma
+Modelul fizic adoptat aici nu se limitează la mișcarea rectilinie uniformă între ricoșeuri. El introduce în volum o dinamică de tip Langevin pentru viteză~\cite{langevin1908,einstein1905}, ceea ce înseamnă că particulele sunt supuse simultan unui termen disipativ și unui termen de zgomot termic. La nivel continuu, modelul standard este
 
 \begin{equation}
     \frac{d\mathbf{r}}{dt}=\mathbf{v},
@@ -171,58 +190,28 @@ unde $\gamma$ este coeficientul de fricțiune, $T$ temperatura efectivă a rezer
     \langle \eta_\alpha(t)\eta_\beta(t') \rangle = \delta_{\alpha\beta}\,\delta(t-t').
 \end{equation}
 
-Această formulare are o interpretare fizică directă. Termenul proporțional cu $-\gamma\mathbf{v}$ tinde să reducă viteza și reprezintă efectul disipativ al unui mediu efectiv. Termenul aleator descrie fluctuațiile microscopice ale aceluiași mediu și introduce agitație termică. Prin urmare, modelul nu mai reprezintă un gaz complet izolat, ci un ansamblu de particule care interacționează efectiv cu un rezervor termic sau cu un fundal stocastic.
+Termenul proporțional cu $-\gamma\mathbf{v}$ reprezintă efectul disipativ al unui mediu efectiv. Termenul aleator descrie fluctuațiile microscopice ale aceluiași mediu și introduce agitație termică. Prin urmare, modelul nu reprezintă un gaz complet izolat, ci un ansamblu de particule în contact cu un rezervor termic efectiv.
 
-Importanța acestei extensii este majoră pentru interpretarea modelului. În varianta pur balistică, distribuția vitezelor este controlată aproape exclusiv de condițiile inițiale și de ricoșeurile la perete. În prezența termenului Langevin, vitezele sunt relaxate statistic către un regim staționar controlat de raportul dintre fricțiune și zgomot. În consecință, descrierea devine mai apropiată de o dinamică browniană sau mezoscopică decât de un gaz ideal complet izolat în sens mecanic strict.
-
-Din punct de vedere teoretic, ceea ce trebuie reținut aici este faptul că în volum nu mai avem strict legea $d\mathbf{v}/dt=0$, ci o ecuație stochastică pentru viteză. Acesta este unul dintre elementele teoretice esențiale care extind modelul cinematic simplu și care trebuie incluse explicit în fundamentele lucrării.
-
-Ecuația Langevin liniară pentru viteză definește un proces de tip Ornstein--Uhlenbeck~\cite{uhlenbeck1930}. Din punct de vedere matematic, acesta este un proces gaussian, markovian, care relaxează către o distribuție staționară~\cite{vankampen2007,risken1989}. Din punct de vedere fizic, el descrie exact competiția dintre disipare și agitație termică.
-
-Pentru o singură componentă a vitezei, ecuația poate fi scrisă formal ca
-
-\begin{equation}
-    m\,dv = -\gamma v\,dt + \sqrt{2\gamma k_B T}\,dW_t,
-\end{equation}
-
-unde $W_t$ este un proces Wiener. Soluția sa are o structură de relaxare exponențială, cu scară caracteristică de timp
+Ecuația Langevin liniară pentru viteză definește un proces de tip Ornstein--Uhlenbeck~\cite{uhlenbeck1930}. Din punct de vedere matematic, acesta este un proces gaussian, markovian, care relaxează către o distribuție staționară~\cite{vankampen2007,risken1989}. Scara caracteristică de timp este
 
 \begin{equation}
     \tau_v = \frac{m}{\gamma}.
 \end{equation}
 
-Această mărime exprimă timpul tipic în care memoria vitezei inițiale este pierdută datorită fricțiunii. Dacă timpul de observație este mult mai mic decât $\tau_v$, mișcarea păstrează un caracter mai apropiat de regimul balistic. Dacă este mult mai mare, sistemul intră într-un regim în care vitezele sunt puternic influențate de rezervorul termic și de zgomot.
+Dacă timpul de observație este mult mai mic decât $\tau_v$, mișcarea păstrează un caracter mai apropiat de regimul balistic. Dacă este mult mai mare, vitezele sunt puternic influențate de rezervorul termic și de zgomot.
 
-Distribuția staționară a vitezelor în modelul Langevin este gaussiană și compatibilă cu distribuția Maxwelliană pe componente. Această proprietate este o consecință directă a relației dintre amplitudinea zgomotului și termenul disipativ. Mai precis, factorul $\sqrt{2\gamma k_B T}$ din ecuația Langevin nu este arbitrar; el exprimă relația fluctuație--disipație. Aceasta afirmă, în esență, că aceeași interacție efectivă cu mediul care introduce fricțiune trebuie să introducă și fluctuații termice cu amplitudine corelată precis, astfel încât regimul staționar să fie compatibil cu temperatura $T$.
+Distribuția staționară a vitezelor în modelul Langevin este gaussiană și compatibilă cu distribuția Maxwelliană pe componente. Amplitudinea zgomotului $\sqrt{2\gamma k_B T}$ nu este arbitrară; ea exprimă teorema fluctuație--disipație~\cite{kubo1966}: aceeași interacție efectivă cu mediul care introduce fricțiune trebuie să introducă și fluctuații termice cu amplitudine corelată precis, astfel încât regimul staționar să fie compatibil cu temperatura $T$~\cite{gardiner2009}.
 
-Această observație este esențială pentru interpretarea modelului. Ea arată că amplitudinea zgomotului nu este aleasă arbitrar, ci este fixată de teorema fluctuație--disipație~\cite{kubo1966}: legătura dintre fricțiune, temperatură și masă. Din punct de vedere teoretic, asta înseamnă că zgomotul nu este un adaos formal, ci reprezintă componenta stochastică impusă de modelul fizic ales~\cite{gardiner2009}. Fără această relație, termenul aleator nu ar mai avea o justificare termodinamică clară.
+\section{Modele de interacție particulă--perete}
 
-\subsection{Modele de interacție particulă--perete}
-
-Un alt element teoretic important este faptul că interacția cu peretele nu este tratată mereu ca reflexie perfect elastică. În locul legii ideale, se folosește un model generalizat în care componentele normală și tangențială ale vitezei după ricoșeu sunt modificate diferit. Din punct de vedere fizic, acești parametri nu trebuie interpretați ca artificii formale, ci ca o descriere efectivă a modului în care materiale diferite ale frontierei schimbă impulsul și energia particulelor incidente. Dacă descompunem viteza incidentă sub forma
-
-\begin{equation}
-    \mathbf{v}=\mathbf{v}_n+\mathbf{v}_t,
-\end{equation}
-
-atunci modelul generalizat poate fi scris ca
+Un alt element teoretic important este faptul că interacția cu peretele nu este tratată mereu ca reflexie perfect elastică. În locul legii ideale, se folosește un model generalizat în care componentele normală și tangențială ale vitezei după ricoșeu sunt modificate diferit. Dacă descompunem viteza incidentă sub forma $\mathbf{v}=\mathbf{v}_n+\mathbf{v}_t$, modelul generalizat este
 
 \begin{equation}
     \mathbf{v}' = -e_n\mathbf{v}_n + \beta_t \mathbf{v}_t,
     \label{eq:general_wall_bounce}
 \end{equation}
 
-unde $e_n$ este coeficientul de restituție normal, iar $\beta_t$ este un factor de amortizare tangențială. Cazul ideal perfect elastic apare ca situație particulară pentru
-
-\begin{equation}
-    e_n=1,
-    \qquad
-    \beta_t=1.
-\end{equation}
-
-În schimb, dacă $e_n<1$, componenta normală a vitezei este redusă la ricoșeu, ceea ce înseamnă pierdere de energie pe direcția normală. Dacă $\beta_t<1$, și componenta tangențială este amortizată, ceea ce poate fi interpretat ca un efect de frecare la perete sau ca o interacție mai complexă cu suprafața.
-
-Acest model este important deoarece permite introducerea unor proprietăți diferite ale frontierelor în regiuni diferite ale geometriei. Astfel, frontiera nu este doar geometric neomogenă, ci și din punctul de vedere al răspunsului mecanic local. Din perspectivă teoretică, aceasta echivalează cu un perete efectiv compus din zone materiale diferite, care schimbă în mod diferit impulsul și energia particulelor incidente.
+unde $e_n \in [0,1]$ este coeficientul de restituție normal, iar $\beta_t \in [0,1]$ este un factor de amortizare tangențială. Cazul ideal perfect elastic apare ca situație particulară pentru $e_n=\beta_t=1$.
 
 Un rezultat imediat al formulei~\eqref{eq:general_wall_bounce} este bilanțul energetic la ricoșeu:
 
@@ -230,30 +219,24 @@ Un rezultat imediat al formulei~\eqref{eq:general_wall_bounce} este bilanțul en
     |\mathbf{v}'|^2 = e_n^2 |\mathbf{v}_n|^2 + \beta_t^2 |\mathbf{v}_t|^2.
 \end{equation}
 
-Rezultă că energia cinetică se conservă numai dacă ambele coeficiente sunt egale cu unu. În toate celelalte cazuri, coliziunea cu peretele devine disipativă. Aceasta schimbă substanțial interpretarea modelului: peretele nu mai este doar un reflector geometric, ci poate acționa ca element de frânare și de selecție a dinamicii.
+Energia cinetică se conservă numai dacă ambele coeficiente sunt egale cu unu. În toate celelalte cazuri, coliziunea cu peretele devine disipativă: peretele nu mai este doar un reflector geometric, ci poate acționa ca element de frânare și de selecție a dinamicii.
 
-Codul conține și o extensie și mai bogată a interacției cu peretele, notată prin modelul de tip OU bounce. Din punct de vedere fizic, aceasta poate fi interpretată ca o condiție la limită termalizantă: particula nu doar ricoșează, ci primește la contact și o contribuție stochastică compatibilă cu temperatura locală a peretelui.
-
-Ideea este de a trata separat componentele tangențială și normală. Pentru componenta tangențială se consideră o regulă de forma
+Codul conține și o extensie termalizantă a interacției cu peretele, notată OUBounce. Din punct de vedere fizic, aceasta poate fi interpretată ca o condiție la limită termalizantă: particula nu doar ricoșează, ci primește la contact și o contribuție stochastică compatibilă cu temperatura locală a peretelui. Componenta tangențială urmează
 
 \begin{equation}
     \mathbf{v}_t' = \beta_t\mathbf{v}_t + \sqrt{1-\beta_t^2}\,s\,\boldsymbol{\xi}_t,
 \end{equation}
 
-unde $s=\sqrt{k_B T / m}$, iar $\boldsymbol{\xi}_t$ este un vector gaussian tangent la suprafață. Pentru componenta normală se folosește o regulă de tip
+iar componenta normală
 
 \begin{equation}
     v_n' = e_n |v_n^{\text{in}}| + \sqrt{1-e_n^2}\,s\,\xi_n,
     \qquad v_n' > 0,
 \end{equation}
 
-unde $\xi_n$ este o variabilă gaussiană scalară, iar condiția $v_n'>0$ exprimă faptul că după coliziune particula trebuie să rămână orientată spre interiorul domeniului accesibil.
+unde $s=\sqrt{k_B T / m}$ și $\boldsymbol{\xi}_t$, $\xi_n$ sunt variabile gaussiene. Factorul $\sqrt{1-e_n^2}$ la zgomotul normal și $\sqrt{1-\beta_t^2}$ la cel tangential sunt impuși de relația fluctuație--disipație: pentru ca distribuția staționară a vitezelor după ricoșeu să fie Maxwell--Boltzmann la temperatura $T$, amplitudinea zgomotului trebuie calibrată precis față de disipare.
 
-Acest model combină trei idei fizice importante. Mai întâi, păstrează caracterul anizotrop al interacției cu peretele prin coeficienții $e_n$ și $\beta_t$. Apoi, introduce fluctuații termice controlate de temperatura efectivă $T$. În sfârșit, respectă faptul că peretele trebuie să producă o viteză de ieșire orientată spre interior, nu spre exterior. Din punct de vedere conceptual, acesta nu mai este un ricoșeu mecanic simplu, ci o condiție la limită stochastică ce modelează schimbul de impuls și agitația termică la frontieră.
-
-Importanța teoretică a acestui model este majoră. El arată că frontiera poate juca rolul unui rezervor termic local și că echilibrul sau regimul staționar al sistemului poate fi influențat nu doar de zgomotul din volum, ci și de modul în care peretele compensează disiparea pentru a nu impune artificial un regim mai rece decât cel dorit. Astfel, termenul stochastic de la perete nu trebuie interpretat ca o sursă arbitrară de agitație, ci ca mecanismul prin care contactul cu o frontieră aflată la aceeași temperatură efectivă este menținut compatibil cu disiparea indusă de ricoșeu. Această idee trebuie privită ca parte a modelului fizic al frontierei, nu ca un detaliu secundar de formulare.
-
-Un caz limită important al modelului termalizant este condiția la limită Maxwell diffuse~\cite{maxwell1879,cercignani1988}. Spre deosebire de OUBounce, unde viteza de ieșire depinde prin termenul $e_n|v_n^\text{in}|$ de viteza incidentă, condiția Maxwell diffuse presupune că particula care lovește peretele intră în contact complet cu rețeaua termică a materialului și uită complet viteza de intrare. Viteza de ieșire este trasă independent din distribuția termică a peretelui:
+Un caz limită important al modelului termalizant este condiția la limită Maxwell diffuse~\cite{maxwell1879,cercignani1988}. Spre deosebire de OUBounce, unde viteza de ieșire depinde prin termenul $e_n|v_n^\text{in}|$ de viteza incidentă, condiția Maxwell diffuse presupune că particula care lovește peretele uită complet viteza de intrare. Viteza de ieșire este trasă independent din distribuția termică a peretelui:
 
 \begin{equation}
     \mathbf{v}_t' \sim \mathcal{N}(0,\, k_BT/m)\text{ în planul tangent},
@@ -267,32 +250,26 @@ Un caz limită important al modelului termalizant este condiția la limită Maxw
 
 Distribuția Rayleigh pentru componenta normală (nu semi-gaussiană) apare din ponderea cu fluxul de particule: o particulă cu viteză normală $v_n'$ mai mare traversează suprafața mai des, deci probabilitatea de emisie este proporțională cu $v_n' \exp(-v_n'^2/2\sigma^2)$, ceea ce dă exact distribuția Rayleigh. Această proprietate garantează bilanțul detaliat la nivel de coliziune individuală: rata de tranziție $\mathbf{v} \to \mathbf{v}'$ este egală cu rata inversă $\mathbf{v}' \to \mathbf{v}$, o condiție mai puternică decât simpla termalizare marginală. Consecința directă este că un sistem cu pereți Maxwell diffuse la aceeași temperatură $T$ satisface $J_\text{loop} = 0$ indiferent de geometrie sau de distribuția materialelor pe frontieră.
 
-\subsection{Echilibru statistic, distribuții staționare și presiune}
+\section{Echilibru statistic, distribuții staționare și presiune}
 
 În modelul analizat aici, noțiunea de echilibru statistic trebuie discutată separat pentru două niveluri. În modelul balistic cu ricoșeu elastic ideal, echilibrul înseamnă în primul rând stabilizarea distribuțiilor spațiale și absența variațiilor sistematice ale observabilelor macroscopice relevante. În modelul extins cu dinamică Langevin și perete termalizant, noțiunea de staționaritate devine mai apropiată de sensul clasic al echilibrului pentru o dinamică în contact cu un rezervor termic.
 
-În absența coliziunilor interparticulare, distribuția Maxwell--Boltzmann nu trebuie introdusă ca rezultat inevitabil al modelului pur balistic. Ea apare natural doar atunci când există un mecanism efectiv de redistribuire statistică a vitezelor, fie prin coliziuni între particule, fie prin cuplarea la un rezervor termic. În modelul extins considerat aici, tocmai termenii Langevin și ricoșeul stocastic la perete joacă acest rol. Din acest motiv, distribuția Maxwell--Boltzmann poate fi menționată nu ca o proprietate a gazului ideal clasic fără coliziuni, ci ca reper pentru regimul staționar al modelului stocastic extins.
+În absența coliziunilor interparticulare, distribuția Maxwell--Boltzmann nu apare ca rezultat inevitabil al modelului pur balistic. Ea apare natural doar atunci când există un mecanism efectiv de redistribuire statistică a vitezelor, fie prin coliziuni între particule, fie prin cuplarea la un rezervor termic. În modelul extins considerat aici, tocmai termenii Langevin și ricoșeul stocastic la perete joacă acest rol.
 
-Din punct de vedere spațial, echilibrul sau regimul staționar se exprimă prin faptul că distribuția de poziții nu mai prezintă o deriva sistematică în timp. Totuși, în geometrii complexe, chiar și în regim staționar pot apărea densități locale diferite, timpi de rezidență diferiți și regiuni care sunt explorate cu frecvențe diferite. Prin urmare, pentru un sistem confinat, staționaritatea nu trebuie confundată automat cu uniformitatea absolută. Atât geometria domeniului, cât și proprietățile materiale ale frontierelor decid în ce măsură această uniformizare are loc și cât de repede este atinsă.
+Din punct de vedere spațial, echilibrul sau regimul staționar se exprimă prin faptul că distribuția de poziții nu mai prezintă o derivă sistematică în timp. Totuși, în geometrii complexe, chiar și în regim staționar pot apărea densități locale diferite și timpi de rezidență diferiți. Prin urmare, staționaritatea nu trebuie confundată automat cu uniformitatea absolută.
 
-În practică, observabilele relevante pentru identificarea regimului staționar sunt distribuțiile spațiale, histogramele vitezelor, frecvențele de vizitare ale diferitelor regiuni, numărul de coliziuni cu anumite porțiuni ale peretelui și, eventual, mărimi derivate precum distanța medie față de frontieră sau timpii de traversare între compartimente. Astfel, echilibrul este mai bine înțeles aici ca staționaritate statistică a unui set de observabile decât ca realizare automată a tuturor proprietăților unui echilibru termodinamic idealizat.
-
-Presiunea este una dintre cele mai importante punți între descrierea microscopică și cea macroscopică. În teoria cinetică, ea este interpretată ca rezultatul transferului de impuls către pereți produs de coliziunile particulelor cu frontiera. Pentru o suprafață de arie $A$, dacă pe un interval de timp $\Delta t$ au loc coliziuni care produc variații de impuls normal $\Delta p_{n,k}$, atunci presiunea medie poate fi exprimată conceptual prin relația
+Presiunea este una dintre cele mai importante punți între descrierea microscopică și cea macroscopică. În teoria cinetică, ea este interpretată ca rezultatul transferului de impuls către pereți produs de coliziunile particulelor cu frontiera~\cite{cercignani1988}. Pentru o suprafață de arie $A$, dacă pe un interval de timp $\Delta t$ au loc coliziuni care produc variații de impuls normal $\Delta p_{n,k}$, atunci presiunea medie poate fi exprimată conceptual prin relația
 
 \begin{equation}
     P \sim \frac{1}{A\,\Delta t}\sum_k \Delta p_{n,k}.
 \end{equation}
 
-Această formulă nu este doar o relație formală, ci exprimă ideea fizică centrală: presiunea este flux de impuls prin frontieră. Într-un model cu ricoșeu ideal, variația de impuls provine din schimbarea semnului componentei normale a vitezei. Într-un model cu ricoșeu generalizat sau cu perete termalizant, aceeași interpretare rămâne valabilă, dar variația de impuls depinde și de coeficienții de restituție, de amortizarea tangențială, de componenta stochastică introdusă la coliziune și, implicit, de caracterul material al porțiunii de perete pe care are loc impactul.
+Această formulă exprimă ideea fizică centrală: presiunea este flux de impuls prin frontieră.
 
-Din punct de vedere fizic, această perspectivă arată ce mărimi sunt relevante pentru caracterizarea sistemului. Cea mai directă variantă constă în contabilizarea coliziunilor cu diferite porțiuni ale frontierei și a variației de impuls asociate fiecăreia. Din aceste date se poate reconstrui forța medie asupra peretelui și, implicit, presiunea. În plus, distribuția particulelor pe regiuni ale geometriei, histogramele distanței față de perete, frecvențele de traversare între compartimente și alte statistici spațiale contribuie la caracterizarea regimului staționar.
-
-Din acest motiv, presiunea nu trebuie privită izolat, ci ca parte a unui ansamblu de observabile macroscopice deduse din dinamica microscopică. Ea este importantă deoarece oferă interpretarea mecanică cea mai directă a ricoșeurilor la perete, dar nu este singura mărime relevantă. Într-o geometrie complexă, distribuțiile spațiale, timpii de rezidență și statisticile de traversare pot fi la fel de importante pentru înțelegerea fizicii sistemului.
-
-\subsection{Observabile statistice din dinamica moleculară}
+\section{Observabile statistice din dinamica moleculară}
 \label{subsec:observabile}
 
-Odată ce modelul fizic și regulile de interacție cu frontiera sunt stabilite, devine esențial să se precizeze ce se măsoară efectiv din simulare. Observabilele statistice sunt mărimi extrase din ansamblul de traiectorii ale particulelor și reprezintă interfața dintre descrierea microscopică și concluzia fizică. Alegerea lor nu este arbitrară: ea trebuie să reflecte întrebările pe care modelul le poate răspunde și să permită compararea cu predicțiile teoretice.
+Odată ce modelul fizic și regulile de interacție cu frontiera sunt stabilite, devine esențial să se precizeze ce se măsoară efectiv din simulare. Observabilele statistice sunt mărimi extrase din ansamblul de traiectorii ale particulelor și reprezintă interfața dintre descrierea microscopică și concluzia fizică.
 
 \paragraph{Distribuția vitezelor și repartiția Maxwell--Boltzmann.}
 Cea mai directă verificare a regimului staționar este distribuția modulului vitezei. Pentru un sistem în echilibru termic la temperatura $T$, distribuția Maxwell--Boltzmann prevede
@@ -302,17 +279,17 @@ Cea mai directă verificare a regimului staționar este distribuția modulului v
     \label{eq:maxwell_boltzmann}
 \end{equation}
 
-valabilă în trei dimensiuni. O condiție echivalentă și mai ușor de verificat numeric este că fiecare componentă cartesiană a vitezei urmează o distribuție gaussiană cu medie nulă și varianță $k_B T / m$, sau, în termeni de valoare medie pătratică,
+valabilă în trei dimensiuni. O condiție echivalentă și mai ușor de verificat numeric este că fiecare componentă cartesiană a vitezei urmează o distribuție gaussiană cu medie nulă și varianță $k_B T / m$, sau în termeni de valoare medie pătratică,
 
 \begin{equation}
     \langle v^2 \rangle = \frac{3k_B T}{m}.
     \label{eq:equipartitie}
 \end{equation}
 
-Această relație servește drept criteriu principal de validare: un sistem aflat în regim staționar termic trebuie să satisfacă~\eqref{eq:equipartitie} în mod consistent și stabil în timp. În simulările cu N=30\,000 de particule efectuate în această lucrare, valoarea măsurată la echilibru este $\langle v^2 \rangle = 3{,}016$, în acord cu valoarea teoretică 3{,}000 pentru $m=k_B T=1$.
+Această relație servește drept criteriu principal de validare. În simulările cu $N=30\,000$ de particule efectuate în această lucrare, valoarea măsurată la echilibru este $\langle v^2 \rangle = 3{,}016$, în acord cu valoarea teoretică 3{,}000 pentru $m=k_B T=1$.
 
 \paragraph{Densitatea spațială.}
-Distribuția spațială a particulelor este descrisă de densitatea locală $\rho(\mathbf{r},t)$, definită operațional ca numărul de particule per unitate de volum într-o vecinătate a punctului $\mathbf{r}$ la momentul $t$. În practică, aceasta se obține prin histograme pe subregiuni ale domeniului. Distribuția uniformă în spațiu este o proprietate a regimului staționar în absența unor forțe externe sau a unor frontiere disipative asimetrice. Devierile de la uniformitate pot indica zone cu acumulare sau rarefiere temporară, bariere entropice induse de geometrie sau asimetrii introduse de proprietățile materiale ale pereților.
+Distribuția spațială a particulelor este descrisă de densitatea locală $\rho(\mathbf{r},t)$, definită operațional ca numărul de particule per unitate de volum într-o vecinătate a punctului $\mathbf{r}$ la momentul $t$. Distribuția uniformă în spațiu este o proprietate a regimului staționar în absența unor forțe externe sau a unor frontiere disipative asimetrice.
 
 \paragraph{Temperatura locală.}
 O extensie a observabilei de mai sus constă în calculul temperaturii locale pe subregiuni ale domeniului:
@@ -321,7 +298,7 @@ O extensie a observabilei de mai sus constă în calculul temperaturii locale pe
     T_{\text{loc}}(\mathbf{r}) = \frac{m}{3k_B}\langle v^2 \rangle_{\mathbf{r}},
 \end{equation}
 
-unde media este efectuată doar asupra particulelor aflate în vecinătatea punctului $\mathbf{r}$. Această mărime permite detectarea regimurilor în care pereții disipați sau asimetrici impun condiții termice diferite în regiuni diferite ale geometriei. Dacă toate frontierele sunt termalizante (model OU), temperatura locală trebuie să fie uniformă și egală cu temperatura de referință $T$. Dacă există frontiere disipative fără compensare stochastică, temperatura locală poate scădea sistematic în apropierea pereților sau în regiunile în care coliziunile sunt frecvente.
+unde media este efectuată doar asupra particulelor aflate în vecinătatea punctului $\mathbf{r}$. Dacă toate frontierele sunt termalizante, temperatura locală trebuie să fie uniformă și egală cu temperatura de referință $T$.
 
 \paragraph{Deplasarea medie pătratică.}
 Deplasarea medie pătratică (MSD) este definită ca
@@ -331,17 +308,19 @@ Deplasarea medie pătratică (MSD) este definită ca
     \label{eq:msd}
 \end{equation}
 
-unde media este efectuată pe ansamblul de particule. Această mărime este deosebit de utilă deoarece identifică regimurile de transport: un regim balistic (mișcare liberă, fără coliziuni frecvente) produce $\text{MSD}(t)\sim t^2$, iar un regim difuziv, dominat de coliziuni repetate cu pereții sau de fricțiunea Langevin, produce $\text{MSD}(t)\sim t$ la timpi lungi. La timpi scurți, curbura geometriei și pasajele înguste se pot manifesta prin devierii de la aceste regimuri simple. Prezența barierelor entropice poate încetini difuzia efectivă și poate produce regimuri intermediare.
+unde media este efectuată pe ansamblul de particule. Un regim balistic produce $\text{MSD}(t)\sim t^2$, iar un regim difuziv produce $\text{MSD}(t)\sim t$ la timpi lungi.
 
 \paragraph{Fluxul de coliziuni și presiunea.}
 Numărul de coliziuni cu fiecare porțiune a frontierei, combinat cu variația de impuls la fiecare impact, permite reconstituirea fluxului de impuls și a presiunii locale. Aceste statistici sunt utile în special pentru compararea comportamentului diferitelor secțiuni materiale ale geometriei și pentru identificarea asimetriilor induse de ricoșeu disipativ sau termalizant.
 
-Împreună, aceste observabile oferă o descriere completă a regimului staționar și a dinamicii de relaxare, permițând trasarea unui răspuns clar la întrebările fizice centrale: în ce măsură geometria și proprietățile materialelor influențează transportul, omogenizarea și echilibrul termic al sistemului.
+Împreună, aceste observabile oferă o descriere completă a regimului staționar și a dinamicii de relaxare, permițând trasarea unui răspuns clar la întrebările fizice centrale.
 
-\section{Model numeric și implementare}
+% ============================================================
+\chapter{Model numeric și implementare}
 \label{sec:model}
+% ============================================================
 
-\subsection{Arhitectura pachetului de simulare}
+\section{Arhitectura pachetului de simulare}
 
 Simulările din această lucrare sunt realizate cu pachetul Python \texttt{brownian\_sim}, organizat după principiul separării responsabilităților~\cite{allen2017,frenkel2002}: fiecare subpachet are un singur rol bine delimitat, iar dependențele sunt unidirecționale. Structura pe disc este prezentată în Figura~\ref{fig:dirtree}.
 
@@ -384,7 +363,7 @@ Fluxul complet de la configurație la rezultate este ilustrat în Figura~\ref{fi
 \newpage
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth]{diagrama_arhitectura.png}
+\includegraphics[width=0.90\textwidth]{diagrama_arhitectura.png}
 \caption{Diagrama fluxului de date în \texttt{brownian\_sim}. Albastru: intrare (YAML); roz: motor de simulare; verde: ieșiri; portocaliu: analiză post-procesare.}
 \label{fig:arhitectura}
 \end{figure}
@@ -424,7 +403,7 @@ Vitezele inițiale sunt trase din distribuția Maxwell--Boltzmann la temperatura
 \paragraph{Performanță și scalabilitate.}
 Pe sistemul de calcul utilizat (Intel Xeon, NumPy 2.4, Python 3.11), un pas de simulare cu $N=30\,000$ de particule în geometria \texttt{loop\_chambers} durează aproximativ 23\,ms, din care circa 5\,ms reprezintă dinamica Langevin pură, iar restul detecția coliziunilor cu geometria. O rulare de 300\,000 de pași necesită circa 2\,ore, iar complexitatea este liniară în $N$. Pachetul conține un selector de backend (\texttt{backend.py}) care permite rularea kernelelor de fizică pe GPU prin CuPy. Măsurătorile pe un sistem cu NVIDIA RTX\,3060 arată speedup de $44\times$ pentru pasul Langevin și $12\times$ pentru modelul MaxwellDiffuse. Detecția coliziunilor cu geometria rămâne pe CPU, iar transferurile de date necesare per sub-pas reduc câștigul net la 0{,}95 față de CPU pur; o implementare full-GPU ar necesita portarea geometriei pe CuPy.
 
-\subsection{Reprezentarea geometriei}
+\section{Reprezentarea geometriei}
 
 Domeniul accesibil particulelor este descris printr-o uniune de primitive simple, fiecare implementând interfața:
 
@@ -459,11 +438,11 @@ Geometria complexă principală din această lucrare este un preset compus din:
     \item un cilindru de retur \texttt{CylX} (\texttt{RET}) care conectează camerele la $y=45$.
 \end{itemize}
 
-Fiecare piesă geometrică are asociat un material (\texttt{WallMaterial(e\_n, beta\_t)}), astfel încât proprietățile frontierelor pot fi diferite pe fiecare segment. Această asimetrie materială este elementul central al experimentelor din Secțiunea~\ref{sec:rezultate}.
+Fiecare piesă geometrică are asociat un material (\texttt{WallMaterial(e\_n, beta\_t)}), astfel încât proprietățile frontierelor pot fi diferite pe fiecare segment. Această asimetrie materială este elementul central al experimentelor din Capitolul~\ref{sec:rezultate}.
 
-\subsection{Algoritmul de simulare}
+\section{Algoritmul de simulare}
 
-Schema de integrare este de tip \emph{time-stepping} cu sub-pași adaptivi~\cite{leimkuhler2015}. La fiecare pas de timp $\Delta t$ mare, distanța la perete este estimată și pasul este subdvizat dacă este necesar (parametrul \texttt{cfl} limitează fracția de traversare a domeniului per sub-pas). Pseudocodul algoritmului este:
+Schema de integrare este de tip \emph{time-stepping} cu sub-pași adaptivi~\cite{leimkuhler2015}. La fiecare pas de timp $\Delta t$ mare, distanța la perete este estimată și pasul este subdivizat dacă este necesar (parametrul \texttt{cfl} limitează fracția de traversare a domeniului per sub-pas). Pseudocodul algoritmului este:
 
 \begin{verbatim}
 pentru fiecare pas t = 1 ... T:
@@ -517,9 +496,7 @@ Modelul Maxwell diffuse implementează condiția la limită a unui perete fizic 
     \label{eq:maxwell_diffuse}
 \end{equation}
 
-unde $s = \sqrt{k_BT/m}$. Distribuția Rayleigh pentru componenta normală (și nu semi-gaussiană) apare din ponderea cu fluxul: particulele care ies cu viteză normală mai mare traversează suprafața mai frecvent, astfel că distribuția de viteză la ieșire este ponderată cu $v_n'$, dând $P(v_n') \propto v_n' \exp(-v_n'^2 / 2s^2)$.
-
-Implementarea folosește transformata inversă pentru Rayleigh:
+unde $s = \sqrt{k_BT/m}$. Implementarea folosește transformata inversă pentru Rayleigh:
 
 \begin{verbatim}
 s = sqrt(kT / m)
@@ -529,9 +506,7 @@ vn' = s * sqrt(g1^2 + g2^2)   # Rayleigh via doua gaussiene
 
 Proprietatea definitorie a acestui model este că viteza de ieșire este \emph{complet independentă} de viteza de intrare. Aceasta este exact condiția de bilanț detaliat la nivel microscopic: pentru orice pereche $(v_\text{in}, v_\text{out})$, probabilitatea tranziției directe și a celei inverse sunt egale în raport cu măsura de echilibru. Ca urmare, $J_\text{loop} = 0$ este garantat prin construcție, indiferent de geometrie sau de eterogenitatea materialelor.
 
-Diferența față de OUBounce este subtilă dar cu consecințe fizice clare: ambele produc o distribuție marginală MB la ieșire, dar numai MaxwellDiffuse satisface bilanțul detaliat microscopic. La $\gamma = 1$ diferența este mascată de termalizarea Langevin din volum; ea devine vizibilă în regim balistic ($\gamma \ll 1$) unde rata de coliziuni cu peretele domină față de termalizarea în volum.
-
-\subsection{Teste de verificare}
+\section{Teste de verificare}
 
 Pachetul conține 30 de teste pytest organizate în trei fișiere corespunzând celor trei straturi ale implementării: geometrie, modele de perete și echilibru Langevin. Toate 30 trec la fiecare rulare.
 
@@ -545,34 +520,36 @@ Primul grup verifică proprietățile matematice ale primitivelor \texttt{Box}, 
     \item \emph{assembly sampling}: \texttt{sample\_uniform} returnează 500 de puncte care sunt toate în interiorul domeniului, atât pentru cutia simplă cât și pentru geometria \texttt{loop\_chambers}.
 \end{itemize}
 
-Aceste teste garantează că algoritmul de detecție a coliziunilor nu produce false pozitive sau negative și că normala locală este întotdeauna orientată corect spre interior, condiție necesară pentru direcționarea corectă a vitezei după ricoșeu.
+Aceste teste garantează că algoritmul de detecție a coliziunilor nu produce false pozitive sau negative și că normala locală este întotdeauna orientată corect spre interior.
 
 \paragraph{Teste modele de perete (12 teste).}
 Al doilea grup verifică proprietățile fizice ale fiecărui model de ricoșeu izolat, fără dinamică Langevin.
 
 Pentru \texttt{ElasticBounce}: componenta normală a vitezei se inversează exact, componenta tangențială se conservă exact, iar energia cinetică $|\mathbf{v}'|^2 = |\mathbf{v}|^2$ este conservată pentru 50 de perechi aleatoare $(v, \hat{n})$ cu toleranță $10^{-10}$.
 
-Pentru \texttt{DampedBounce}: cu $e_n = 0{,}5$ și $\beta_t = 1{,}0$, componenta normală se reduce la jumătate; cu $e_n = 1{,}0$ și $\beta_t = 0{,}3$, componenta tangențială se reduce la $0{,}3$ din valoarea inițială. Aceste teste verifică că parametrii materialului sunt aplicați pe axele corecte.
+Pentru \texttt{DampedBounce}: cu $e_n = 0{,}5$ și $\beta_t = 1{,}0$, componenta normală se reduce la jumătate; cu $e_n = 1{,}0$ și $\beta_t = 0{,}3$, componenta tangențială se reduce la $0{,}3$ din valoarea inițială.
 
-Pentru \texttt{OUBounce}: (1) viteza normală de ieșire $v_n' = \mathbf{v}'\cdot\hat{n}$ este strict pozitivă pentru 100 de viteze incidente aleatoare, deci particula iese întotdeauna spre interior; (2) aplicând ricoșeul pe 5\,000 de viteze incidente gaussiene, varianța componentelor tangențiale ale vitezelor de ieșire este $\sigma^2 \in [0{,}9, 1{,}1]$, confirmând termalizarea la $k_BT/m = 1$; (3) implementarea batch (vectorizată pe $N$ particule simultan) produce aceeași statistică ca implementarea single-particle.
+Pentru \texttt{OUBounce}: (1) viteza normală de ieșire $v_n' = \mathbf{v}'\cdot\hat{n}$ este strict pozitivă pentru 100 de viteze incidente aleatoare; (2) aplicând ricoșeul pe 5\,000 de viteze incidente gaussiene, varianța componentelor tangențiale ale vitezelor de ieșire este $\sigma^2 \in [0{,}9, 1{,}1]$, confirmând termalizarea la $k_BT/m = 1$; (3) implementarea batch produce aceeași statistică ca implementarea single-particle.
 
-Pentru \texttt{MaxwellDiffuse}: (1) viteza normală de ieșire este strict pozitivă pentru 200 de viteze incidente aleatoare; (2) corelația dintre $|\mathbf{v}_\text{in}|$ și componenta normală de ieșire este $|r| < 0{,}05$ pe 3\,000 de coliziuni, confirmând că viteza de ieșire este complet independentă de cea de intrare; (3) componenta normală de ieșire urmează distribuția Rayleigh: media măsurată $\bar{v}_n = \sigma\sqrt{\pi/2}$ și varianța $\sigma^2(2 - \pi/2)$ cu $\sigma = \sqrt{k_BT/m}$, verificate cu toleranță $0{,}05$; (4) componentele tangențiale au varianță $\approx k_BT/m$; (5) implementarea batch produce aceeași statistică.
+Pentru \texttt{MaxwellDiffuse}: (1) viteza normală de ieșire este strict pozitivă pentru 200 de viteze incidente aleatoare; (2) corelația dintre $|\mathbf{v}_\text{in}|$ și componenta normală de ieșire este $|r| < 0{,}05$ pe 3\,000 de coliziuni, confirmând că viteza de ieșire este complet independentă de cea de intrare; (3) componenta normală de ieșire urmează distribuția Rayleigh verificată cu toleranță $0{,}05$; (4) componentele tangențiale au varianță $\approx k_BT/m$; (5) implementarea batch produce aceeași statistică.
 
 \paragraph{Teste echilibru Langevin (3 teste).}
-Al treilea grup verifică comportamentul termodinamic la nivel de simulare completă, nu doar la nivel de coliziune individuală.
+Al treilea grup verifică comportamentul termodinamic la nivel de simulare completă.
 
-\emph{Menținerea echilibrului}: pornind de la viteze Maxwell--Boltzmann ($N=1\,000$, 1\,000 pași), $\langle v^2 \rangle$ rămâne în intervalul $[2{,}7, 3{,}3]$, eroare relativă sub 10\%.
+\emph{Menținerea echilibrului}: pornind de la viteze Maxwell--Boltzmann ($N=1\,000$, 1\,000 pași), $\langle v^2 \rangle$ rămâne în intervalul $[2{,}7, 3{,}3]$.
 
-\emph{Relaxare din starea rece}: pornind cu toate vitezele nule ($N=1\,000$, 3\,000 pași), $\langle v^2 \rangle$ convergează la $3{,}0 \pm 0{,}45$; sistemul se încălzește la temperatura de rezervor prin dinamica Langevin și OUBounce la perete.
+\emph{Relaxare din starea rece}: pornind cu toate vitezele nule ($N=1\,000$, 3\,000 pași), $\langle v^2 \rangle$ convergează la $3{,}0 \pm 0{,}45$.
 
-\emph{Conservarea numărului de particule în geometrie complexă}: după 500 de pași în \texttt{loop\_chambers} cu 500 de particule, niciuna nu are \texttt{piece\_idx} $= -1$ (indicator de pierdere din domeniu). Acesta verifică robustețea algoritmului de reflecție la joncțiunile dintre primitive (colțuri și muchii) unde normala locală poate fi ambiguă.
+\emph{Conservarea numărului de particule în geometrie complexă}: după 500 de pași în \texttt{loop\_chambers} cu 500 de particule, niciuna nu are \texttt{piece\_idx} $= -1$ (indicator de pierdere din domeniu).
 
-Împreună, cele 30 de teste acoperă separat fiecare nivel al implementării, permițând localizarea rapidă a oricărei regresii și oferind garanția că rezultatele fizice nu sunt contaminate de artefacte numerice la frontiere.
+Împreună, cele 30 de teste acoperă separat fiecare nivel al implementării, permițând localizarea rapidă a oricărei regresii.
 
-\section{Rezultate}
+% ============================================================
+\chapter{Rezultate}
 \label{sec:rezultate}
+% ============================================================
 
-\subsection{Caz de referință: cutia simplă}
+\section{Caz de referință: cutia simplă}
 
 Primul set de simulări folosește o geometrie simplă (o cutie paralelipipedică de dimensiuni $60 \times 60 \times 60$) pentru a valida modelul numeric și a stabili un etalon de comparație. Parametrii sunt cei din Tabelul~\ref{tab:params}, cu $\gamma = 1.0$ și $N=5\,000$ de particule.
 
@@ -580,7 +557,7 @@ Figura~\ref{fig:v2_box} arată evoluția în timp a valorii $\langle v^2 \rangle
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth]{../sim_out/plots/fig1_v2_box.png}
+\includegraphics[width=0.92\textwidth]{../sim_out/plots/fig1_v2_box.png}
 \caption{Evoluția $\langle v^2\rangle$ în timp pentru patru configurații în cutia simplă: elastic (constant la 3.0), OU cu $e_n=0{,}9$ (convergență rapidă), OU absorbant (convergență la 3.0 din orice stare inițială), amortizat absorbant (scădere continuă, fără echilibru termal).}
 \label{fig:v2_box}
 \end{figure}
@@ -589,42 +566,42 @@ Figura~\ref{fig:mb_box} prezintă histograma distribuției vitezelor la echilibr
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.72\textwidth]{../sim_out/plots/fig2_mb_distribution.png}
+\includegraphics[width=0.88\textwidth]{../sim_out/plots/fig2_mb_distribution.png}
 \caption{Distribuția modulului vitezei la echilibru (ElasticBounce, cutie simplă) față de curba Maxwell--Boltzmann teoretică~\eqref{eq:maxwell_boltzmann}. Acordul este excelent pe întregul domeniu de viteză.}
 \label{fig:mb_box}
 \end{figure}
 
-\subsection{Geometria \texttt{loop\_chambers}: prezentare și parametri materiali}
+\section{Geometria \texttt{loop\_chambers}: prezentare și parametri materiali}
 
 Geometria complexă principală este prezentată în Figura~\ref{fig:geom_preview}. Ea este formată din două camere cubice (\texttt{CUBE\_L} și \texttt{CUBE\_R}) conectate prin două căi: un canal cu pâlnie compus din șase cilindri \texttt{FUN\_1}\,--\,\texttt{FUN\_6} (axa $y$, secțiune variabilă) și un canal de retur cilindric \texttt{RET} (axa $x$, la $y=45$).
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.78\textwidth]{../sim_out/preview_loop_chambers_ou.png}
+\includegraphics[width=0.90\textwidth]{../sim_out/preview_loop_chambers_ou.png}
 \caption{Vedere perspectivă a geometriei \texttt{loop\_chambers}: camerele \texttt{CUBE\_L} (stânga) și \texttt{CUBE\_R} (dreapta) sunt conectate prin canalul cu pâlnie (sus) și canalul de retur \texttt{RET} (jos). Culorile diferite indică piesele geometrice cu materiale distincte.}
 \label{fig:geom_preview}
 \end{figure}
 
 Fiecare piesă are asociat un material descris prin coeficienții $(e_n, \beta_t)$. În configurațiile eterogene, camerele și canalele au coeficienți diferiți, introducând o asimetrie materială între cele două căi de traversare.
 
-\subsection{Efectul modelului de perete în geometria complexă}
+\section{Efectul modelului de perete în geometria complexă}
 
 Figura~\ref{fig:v2_loop} arată evoluția $\langle v^2 \rangle$ în geometria \texttt{loop\_chambers} pentru trei modele de perete cu $\gamma = 1{,}0$. Configurația elastică menține temperatura constantă, ca în cutia simplă. Configurația OU cu materiale uniforme convergă de asemenea la $\langle v^2 \rangle = 3{,}000$, confirmând că peretele termalizant respectă relația fluctuație--disipație indiferent de forma domeniului. Configurația amortizată eterogenă prezintă o scădere lentă a temperaturii, produsă de disipare necompensată.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth]{../sim_out/plots/fig3_v2_loop.png}
+\includegraphics[width=0.92\textwidth]{../sim_out/plots/fig3_v2_loop.png}
 \caption{Evoluția $\langle v^2\rangle$ în geometria \texttt{loop\_chambers} pentru ElasticBounce, OUBounce uniform și DampedBounce eterogen. Modelul OU menține echilibrul termal, indiferent de geometrie.}
 \label{fig:v2_loop}
 \end{figure}
 
-\subsection{Distribuția coliziunilor și asimetria materială}
+\section{Distribuția coliziunilor și asimetria materială}
 
 O observabilă specifică geometriei compuse este distribuția coliziunilor per regiune. Figura~\ref{fig:counts} arată frecvența normalizată de coliziuni pentru fiecare piesă a geometriei, în configurația DampedBounce eterogen. Valorile diferă semnificativ între \texttt{CUBE\_L}, \texttt{CUBE\_R}, pâlnie și canal de retur, reflectând atât diferențele de arie, cât și frecvența diferită de accesare a fiecărei regiuni.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\textwidth]{../sim_out/plots/fig4_counts_loop.png}
+\includegraphics[width=0.92\textwidth]{../sim_out/plots/fig4_counts_loop.png}
 \caption{Numărul normalizat de coliziuni per piesă geometrică în geometria \texttt{loop\_chambers} (DampedBounce eterogen). Asimetria L/R reflectă combinarea efectului geometric (arie, acces) cu cel material ($e_n$, $\beta_t$).}
 \label{fig:counts}
 \end{figure}
@@ -633,23 +610,23 @@ Figura~\ref{fig:asymmetry} compară asimetria $N_L - N_R$ (diferența de coliziu
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.72\textwidth]{../sim_out/plots/fig5_asymmetry.png}
+\includegraphics[width=0.88\textwidth]{../sim_out/plots/fig5_asymmetry.png}
 \caption{Asimetria $N_L - N_R$ pentru configurațiile DampedBounce uniform și eterogen. Diferența dintre cele două curbe izolează contribuția eterogenității materialelor față de efectul geometric pur.}
 \label{fig:asymmetry}
 \end{figure}
 
-\subsection{Distribuția vitezelor în geometria complexă — OUBounce și Maxwell diffuse}
+\section{Distribuția vitezelor în geometria complexă — OUBounce și Maxwell diffuse}
 
 Figura~\ref{fig:mb_loop_ou} prezintă distribuția vitezelor în geometria \texttt{loop\_chambers} cu OUBounce și materiale eterogene, măsurată după atingerea regimului staționar. Histograma se suprapune cu curba Maxwell--Boltzmann, demonstrând că modelul OU produce o distribuție marginală a vitezelor corectă la temperatura $T$, indiferent de forma domeniului sau de eterogenitatea coeficienților $(e_n, \beta_t)$.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.72\textwidth]{../sim_out/plots/fig6_mb_loop_ou.png}
+\includegraphics[width=0.88\textwidth]{../sim_out/plots/fig6_mb_loop_ou.png}
 \caption{Distribuția modulului vitezei în \texttt{loop\_chambers} cu OUBounce eterogen față de curba Maxwell--Boltzmann teoretică. Distribuția marginală a vitezelor e corectă, dar aceasta nu garantează singură echilibrul termodinamic global.}
 \label{fig:mb_loop_ou}
 \end{figure}
 
-\subsection{Testul de echilibru termodinamic: curentul net prin loop}
+\section{Testul de echilibru termodinamic: curentul net prin loop}
 \label{subsec:ness}
 
 Distribuția Maxwell--Boltzmann a vitezelor este o condiție necesară dar nu suficientă pentru echilibrul termodinamic. Un test mai sensibil este curentul net $J_\text{loop}$ prin ciclul CUBE\_L $\to$ FUNNELS $\to$ CUBE\_R $\to$ RET, calculat din matricea de tranziții observată:
@@ -685,8 +662,10 @@ Rezultatele arată că la $\gamma=1$ și număr suficient de tranziții, toate m
 
 Diferența fundamentală între modele nu este în starea de echilibru finală, ci în \emph{garanția teoretică} cu care aceasta este atinsă. Modelul Maxwell diffuse satisface bilanțul detaliat la nivel de coliziune individuală: viteza de ieșire este complet independentă de viteza de intrare, ceea ce garantează $J_\text{loop} = 0$ prin construcție. OUBounce satisface FDT local (distribuția marginală de ieșire e MB), dar viteza de ieșire depinde parțial de cea de intrare prin termenul $e_n|v_{n}^\text{in}|$, ceea ce rupe bilanțul detaliat microscopic. La $\gamma=1$, efectul e compensat de Langevin în volum și nu se observă diferență practică. Această distincție devine importantă în regimuri balistice ($\gamma \ll 1$) sau pentru geometrii cu rate de coliziune foarte asimetrice.
 
-\section{Concluzii}
+% ============================================================
+\chapter{Concluzii}
 \label{sec:concluzii}
+% ============================================================
 
 Această lucrare a studiat mișcarea Browniană a unui ansamblu de particule independente într-o geometrie de confinare complexă (două camere cuplate printr-un canal cu pâlnie asimetrică și un canal de retur), cu accent pe rolul condiției la limită la perete și al proprietăților materiale ale frontierelor.
 
@@ -708,6 +687,11 @@ Limitele principale ale modelului sunt absența coliziunilor interparticulare ș
 
 Direcțiile naturale de extindere includ introducerea unui gradient termic ($T_L \neq T_R$) între cele două camere, care ar produce un NESS real cu flux de căldură staționar măsurabil, și studierea regimului de densitate finită cu interacții Lennard-Jones, unde efectele geometriei s-ar combina cu cele ale coliziunilor interparticulare. Prima direcție corespunde principiului de funcționare al pompelor Knudsen~\cite{knudsen1909}, dispozitive fără piese mobile care pompează gaz prin gradient termic în regim rarefiat ($\text{Kn} = \lambda/L \gtrsim 0{,}1$). La această scară, simularea Brownian/Langevin este instrumentul adecvat~\cite{cercignani1988}, deoarece ipoteza de fluid continuu din metodele CFD clasice nu mai este valabilă, iar coliziunile individuale particulă--perete constituie mecanismul dominant.
 
+% --- Bibliografie ---
+\renewcommand{\contentsname}{Referințe}
+\renewcommand\bibname{Referințe}
+\addcontentsline{toc}{chapter}{Referințe}
+\markboth{Referințe}{Referințe}
 \bibliographystyle{unsrt}
 \bibliography{main}
 
