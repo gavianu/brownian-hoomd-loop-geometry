@@ -56,6 +56,10 @@ Simulări disponibile în `sim_out/`:
 ## RESTRICȚIE LaTeX — IMPORTANT
 Schimbările de fraze întregi sau paragrafe în `latex/main.tex` necesită confirmare explicită din partea utilizatorului înainte de execuție. Modificările de date numerice (tabele, valori), referințe și structuri tehnice minore sunt permise fără confirmare.
 
+## Convenții de scriere LaTeX
+- **Fără em-dash (`---`) în textul narativ** — folosește virgulă, două puncte sau paranteză. Em-dash-ul apare doar în comentarii LaTeX (`% ---`).
+- Liniuța de unire între cuvinte compuse: `--` (en-dash), ex. `particulă--perete`.
+
 ## Validare cod
 - `<v²>` = 3.016 la echilibru (țintă 3.000) ✓
 - 25/25 teste pytest trec ✓

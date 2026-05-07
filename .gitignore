@@ -6,7 +6,22 @@ __pycache__/
 sim_out/
 # results/ este versionat intentionat — doar CSV-uri, fara GSD
 
-# Private correspondence (nu se urcă pe GitHub)
+# LaTeX build artifacts — main.pdf este versionat intentionat
+latex/main_check.*
+latex/main_final.*
+latex/main_preview.*
+latex/*.aux
+latex/*.bbl
+latex/*.blg
+latex/*.out
+latex/*.toc
+latex/*.log
+
+# Fișiere personale (nu se urcă pe GitHub)
+program_licenta.html
+raport_subiecte_examen.html
+
+# Private correspondence
 WhatsApp Chat*.zip
 whatsapp_chat/
 
